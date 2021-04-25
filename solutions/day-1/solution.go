@@ -32,14 +32,14 @@ func main() {
 	}
 
 	if *partPtr == "1" {
-		part1(log, parsedInput)
+		log.Printf("Part 1 solution: %d", part1(log, parsedInput))
 	}
 	if *partPtr == "2" {
-		part2(log, parsedInput)
+		log.Printf("Part 2 solution: %d", part2(log, parsedInput))
 	}
 	if *partPtr == "both" {
-		part1(log, parsedInput)
-		part2(log, parsedInput)
+		log.Printf("Part 1 solution: %d", part1(log, parsedInput))
+		log.Printf("Part 2 solution: %d", part2(log, parsedInput))
 	}
 }
 

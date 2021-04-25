@@ -43,12 +43,12 @@ func main() {
 	}
 }
 
-func parseInput(input string) ([]int64, error) {
+func parseInput(input string) ([]int, error) {
 	lines := strings.Split(strings.TrimSpace(input), "\n")
-	numbers := make([]int64, len(lines))
+	numbers := make([]int, len(lines))
 
 	for index, line := range lines {
-		number, err := strconv.ParseInt(line, 10, 64)
+		number, err := strconv.Atoi(line)
 		if err != nil {
 			return nil, err
 		}
@@ -58,13 +58,13 @@ func parseInput(input string) ([]int64, error) {
 	return numbers, nil
 }
 
-func calculateMass(mass int64) int64 {
+func calculateMass(mass int) int {
 	// `/` does floor division with integers
 	return mass/3 - 2
 }
 
-func calculateMassWithFuel(mass int64) int64 {
-	var totalMass int64 = 0
+func calculateMassWithFuel(mass int) int {
+	var totalMass int = 0
 	nextMass := mass
 
 	// Repeatedly calculate mass of fuel until it reaches zero or less
@@ -80,20 +80,20 @@ func calculateMassWithFuel(mass int64) int64 {
 	return totalMass
 }
 
-func part1(log *log.Logger, input []int64) int64 {
+func part1(log *log.Logger, input []int) int {
 	log.Println("Day 1 Part 1")
 
-	sum := int64(0)
+	sum := int(0)
 	for _, moduleMass := range input {
 		sum += calculateMass(moduleMass)
 	}
 	return sum
 }
 
-func part2(log *log.Logger, input []int64) int64 {
+func part2(log *log.Logger, input []int) int {
 	log.Println("Day 1 Part 2")
 
-	sum := int64(0)
+	sum := int(0)
 	for _, moduleMass := range input {
 		sum += calculateMassWithFuel(moduleMass)
 	}

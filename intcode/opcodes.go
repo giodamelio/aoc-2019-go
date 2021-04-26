@@ -11,10 +11,17 @@ const (
 	Immediate
 )
 
+type readWrite int
+
+const (
+	Read readWrite = iota
+	Write
+)
+
 type Opcode struct {
 	name       string
 	opcode     int
-	parameters int
+	parameters []readWrite
 	execute    func(*Memory, []int, chan int, chan int)
 }
 
@@ -22,7 +29,7 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 	1: {
 		name:       "ADD",
 		opcode:     1,
-		parameters: 3,
+		parameters: []readWrite{Read, Read, Write},
 		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
 			leftHandSide := memory.Get(parameters[0])
 			rightHandSide := memory.Get(parameters[1])
@@ -40,7 +47,7 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 	2: {
 		name:       "MULTIPLY",
 		opcode:     2,
-		parameters: 3,
+		parameters: []readWrite{Read, Read, Write},
 		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
 			leftHandSide := memory.Get(parameters[0])
 			rightHandSide := memory.Get(parameters[1])
@@ -58,7 +65,7 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 	3: {
 		name:       "INPUT",
 		opcode:     3,
-		parameters: 1,
+		parameters: []readWrite{Write},
 		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
 			value := <-input
 
@@ -73,7 +80,7 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 	4: {
 		name:       "OUTPUT",
 		opcode:     4,
-		parameters: 1,
+		parameters: []readWrite{Read},
 		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
 			value := memory.Get(parameters[0])
 
@@ -88,7 +95,7 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 	99: {
 		name:       "HALT",
 		opcode:     99,
-		parameters: 0,
+		parameters: []readWrite{},
 		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
 			log.
 				Debug().

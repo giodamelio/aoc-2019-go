@@ -29,7 +29,7 @@ func TestParseOpcode(t *testing.T) {
 		opcode, parameterModes, err := computer.parseOpcode(opcode)
 
 		assert.Nil(t, err)
-		assert.Equal(t, computer.opcodes[opcode].parameters, len(parameterModes))
+		assert.Equal(t, len(computer.opcodes[opcode].parameters), len(parameterModes))
 	}
 }
 

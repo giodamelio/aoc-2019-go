@@ -51,7 +51,7 @@ func (ic Computer) parseOpcode(rawOpcode int) (int, []mode, error) {
 	}
 
 	// Get the number of parameters of that opcode
-	parameterCount := opcodeDefinition.parameters
+	parameterCount := len(opcodeDefinition.parameters)
 
 	// Format the rawOpcode to be as long as the opcode + parameters
 	rawOpcodeStringWithParameterModes := fmt.Sprintf("%0*d", 2+parameterCount, rawOpcode)
@@ -87,7 +87,8 @@ func (ic *Computer) Step() (int, error) {
 	}
 
 	// Get the parameters for the opcode
-	opcodeParameters := ic.Memory.GetRange(ic.programCounter+1, ic.opcodes[opcode].parameters)
+	parametersLength := len(ic.opcodes[opcode].parameters)
+	opcodeParameters := ic.Memory.GetRange(ic.programCounter+1, parametersLength)
 	log.Trace().Ints("parameters", opcodeParameters).Msg("[COMPUTER] Retrieved opcode parameters")
 
 	// Execute the opcode
@@ -96,7 +97,7 @@ func (ic *Computer) Step() (int, error) {
 	operation.execute(ic.Memory, opcodeParameters, ic.input, ic.output)
 
 	// Increment program counter
-	ic.programCounter = ic.programCounter + ic.opcodes[opcode].parameters + 1
+	ic.programCounter = ic.programCounter + parametersLength + 1
 
 	return opcode, nil
 }

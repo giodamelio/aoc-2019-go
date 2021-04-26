@@ -81,3 +81,7 @@ func (ic *Computer) SendInput(input int) {
 		ic.input <- input
 	}()
 }
+
+func (ic *Computer) GetOutputChannel() chan int {
+	return ic.output
+}

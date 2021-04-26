@@ -17,7 +17,7 @@ func init() {
 func TestNewComputer(t *testing.T) {
 	computer := NewComputer([]int{1, 2, 3})
 
-	assert.Equal(t, 0, computer.programCounter)
+	assert.Equal(t, 0, computer.instructionPointer)
 	assert.Equal(t, []int{1, 2, 3}, computer.Memory.rawMemory)
 }
 

@@ -8,12 +8,12 @@ import (
 )
 
 type Computer struct {
-	Memory         *Memory
-	programCounter int
-	opcodes        map[int]Opcode
-	errorHandler   func(error)
-	input          chan int
-	output         chan int
+	Memory             *Memory
+	instructionPointer int
+	opcodes            map[int]Opcode
+	errorHandler       func(error)
+	input              chan int
+	output             chan int
 }
 
 func NewComputer(initialMemory []int) *Computer {
@@ -21,7 +21,7 @@ func NewComputer(initialMemory []int) *Computer {
 
 	comp := new(Computer)
 	comp.Memory = newMemory(initialMemory)
-	comp.programCounter = 0
+	comp.instructionPointer = 0
 	comp.opcodes = Opcodes
 	comp.input = make(chan int)
 	comp.output = make(chan int)
@@ -121,8 +121,8 @@ func (ic Computer) resolveParameters(memory *Memory, opcode int, opcodeParameter
 }
 
 func (ic *Computer) Step() (int, error) {
-	// Get the opcode at the address of the program counter
-	opcode := ic.Memory.Get(ic.programCounter)
+	// Get the opcode at the address of the instruction pointer
+	opcode := ic.Memory.Get(ic.instructionPointer)
 	log.Trace().Int("opcode", opcode).Msg("[COMPUTER] Retrieved opcode")
 
 	// Parse the opcode
@@ -139,7 +139,7 @@ func (ic *Computer) Step() (int, error) {
 
 	// Get the parameters for the opcode
 	parametersLength := len(ic.opcodes[opcode].parameters)
-	opcodeParameters := ic.Memory.GetRange(ic.programCounter+1, parametersLength)
+	opcodeParameters := ic.Memory.GetRange(ic.instructionPointer+1, parametersLength)
 	log.Trace().Ints("parameters", opcodeParameters).Msg("[COMPUTER] Retrieved opcode parameters")
 
 	// Resolve the parameters based on the modes
@@ -154,8 +154,8 @@ func (ic *Computer) Step() (int, error) {
 	log.Trace().Str("opcodeName", operation.name).Msg("[COMPUTER] Executing operation")
 	operation.execute(ic.Memory, opcodeParameters, ic.input, ic.output)
 
-	// Increment program counter
-	ic.programCounter = ic.programCounter + parametersLength + 1
+	// Increment the instruction counter
+	ic.instructionPointer = ic.instructionPointer + parametersLength + 1
 
 	return opcode, nil
 }

@@ -1,10 +1,18 @@
 package intcode
 
 import (
+	"os"
 	"testing"
 
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 )
+
+func init() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, NoColor: true})
+	zerolog.SetGlobalLevel(zerolog.TraceLevel)
+}
 
 func TestNewComputer(t *testing.T) {
 	computer := NewComputer([]int{1, 2, 3})

@@ -2,6 +2,8 @@ package intcode
 
 import (
 	"fmt"
+
+	"github.com/rs/zerolog/log"
 )
 
 type Computer struct {
@@ -12,6 +14,8 @@ type Computer struct {
 }
 
 func NewComputer(initialMemory []int) *Computer {
+	log.Debug().Msg("[COMPUTER] Computer created")
+
 	comp := new(Computer)
 	comp.Memory = newMemory(initialMemory)
 	comp.programCounter = 0
@@ -19,6 +23,7 @@ func NewComputer(initialMemory []int) *Computer {
 
 	// Default to panicing when things go wrong
 	comp.errorHandler = func(err error) {
+		log.Err(err).Msg("[COMPUTER] Uncaught error")
 		panic(err)
 	}
 
@@ -28,6 +33,7 @@ func NewComputer(initialMemory []int) *Computer {
 func (ic *Computer) Step() (int, error) {
 	// Get the opcode at the address of the program counter
 	opcode := ic.Memory.Get(ic.programCounter)
+	log.Trace().Int("opcode", opcode).Msg("[COMPUTER] Retrieved opcode")
 
 	// Check if it is a valid opcode
 	if _, ok := ic.opcodes[opcode]; !ok {
@@ -37,9 +43,12 @@ func (ic *Computer) Step() (int, error) {
 
 	// Get the arguments for the opcode
 	opcodeArguments := ic.Memory.GetRange(ic.programCounter+1, ic.opcodes[opcode].arguments)
+	log.Trace().Ints("arguments", opcodeArguments).Msg("[COMPUTER] Retrieved opcode arguments")
 
 	// Execute the opcode
-	ic.opcodes[opcode].execute(ic.Memory, opcodeArguments)
+	operation := ic.opcodes[opcode]
+	log.Trace().Str("opcodeName", operation.name).Msg("[COMPUTER] Executing operation")
+	operation.execute(ic.Memory, opcodeArguments)
 
 	// Increment program counter
 	ic.programCounter = ic.programCounter + ic.opcodes[opcode].arguments + 1

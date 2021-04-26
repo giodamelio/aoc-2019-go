@@ -37,7 +37,61 @@ func TestParseOpcodeInvalid(t *testing.T) {
 	computer := NewComputer([]int{})
 
 	_, _, err := computer.parseOpcode(1050)
-	assert.Equal(t, err.Error(), "invalid opcode: 50")
+	assert.Equal(t, "invalid opcode: 50", err.Error())
+}
+
+func TestResolveParameters(t *testing.T) {
+	computer := NewComputer([]int{11002, 11, 11, 0})
+	opcodeParameters, err := computer.resolveParameters(
+		computer.Memory,
+		2,
+		[]int{11, 11, 0},
+		[]mode{Immediate, Immediate, Position},
+	)
+
+	assert.Nil(t, err)
+	assert.Equal(t, []int{11, 11, 0}, opcodeParameters)
+}
+
+func TestResolveParametersErrors(t *testing.T) {
+	computer := NewComputer([]int{11102, 11, 11, 0})
+
+	opcodeParameters, err := computer.resolveParameters(
+		computer.Memory,
+		2,
+		[]int{11, 11, 0},
+		[]mode{Immediate, Immediate, Immediate},
+	)
+
+	assert.Equal(t, "write parameter cannot be in immediate mode: 0", err.Error())
+	assert.Nil(t, opcodeParameters)
+
+	opcodeParameters, err = computer.resolveParameters(
+		computer.Memory,
+		2,
+		[]int{11, 11, 0},
+		[]mode{Immediate, Immediate, 2},
+	)
+
+	assert.Equal(t, "invalid mode: 2", err.Error())
+	assert.Nil(t, opcodeParameters)
+
+	// Create new opcode with bad parameter mode
+	computer.opcodes[98] = Opcode{
+		name:       "FAKE",
+		opcode:     98,
+		parameters: []readWrite{Read, Read, 2},
+		execute:    func(memory *Memory, parameters []int, input chan int, output chan int) {},
+	}
+	opcodeParameters, err = computer.resolveParameters(
+		computer.Memory,
+		98,
+		[]int{11, 11, 0},
+		[]mode{Immediate, Immediate, Position},
+	)
+
+	assert.Equal(t, "invalid parameter mode: 0", err.Error())
+	assert.Nil(t, opcodeParameters)
 }
 
 func TestStep(t *testing.T) {

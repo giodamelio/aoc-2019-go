@@ -31,8 +31,8 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		opcode:     1,
 		parameters: []readWrite{Read, Read, Write},
 		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
-			leftHandSide := memory.Get(parameters[0])
-			rightHandSide := memory.Get(parameters[1])
+			leftHandSide := parameters[0]
+			rightHandSide := parameters[1]
 			result := leftHandSide + rightHandSide
 			memory.Set(parameters[2], result)
 
@@ -49,8 +49,8 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		opcode:     2,
 		parameters: []readWrite{Read, Read, Write},
 		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
-			leftHandSide := memory.Get(parameters[0])
-			rightHandSide := memory.Get(parameters[1])
+			leftHandSide := parameters[0]
+			rightHandSide := parameters[1]
 			result := leftHandSide * rightHandSide
 			memory.Set(parameters[2], result)
 
@@ -82,7 +82,7 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		opcode:     4,
 		parameters: []readWrite{Read},
 		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
-			value := memory.Get(parameters[0])
+			value := parameters[0]
 
 			output <- value
 

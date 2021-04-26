@@ -16,20 +16,20 @@ func init() {
 
 func TestAdd(t *testing.T) {
 	opcodeAdd := Opcodes[1]
-	memory := newMemory([]int{1, 0, 0, 0})
+	memory := newMemory([]int{1, 1, 1, 0})
 
 	opcodeAdd.execute(memory, memory.rawMemory[1:], nil, nil)
 
-	assert.Equal(t, []int{2, 0, 0, 0}, memory.rawMemory)
+	assert.Equal(t, []int{2, 1, 1, 0}, memory.rawMemory)
 }
 
 func TestMultiply(t *testing.T) {
 	opcodeMultiply := Opcodes[2]
-	memory := newMemory([]int{2, 0, 0, 0})
+	memory := newMemory([]int{2, 2, 2, 0})
 
 	opcodeMultiply.execute(memory, memory.rawMemory[1:], nil, nil)
 
-	assert.Equal(t, []int{4, 0, 0, 0}, memory.rawMemory)
+	assert.Equal(t, []int{4, 2, 2, 0}, memory.rawMemory)
 }
 
 func TestInput(t *testing.T) {
@@ -49,13 +49,13 @@ func TestInput(t *testing.T) {
 
 func TestOutput(t *testing.T) {
 	opcodeOutput := Opcodes[4]
-	memory := newMemory([]int{4, 2, 10})
+	memory := newMemory([]int{4, 10, 10})
 
 	output := make(chan int, 1)
 
 	opcodeOutput.execute(memory, memory.rawMemory[1:], nil, output)
 
-	assert.Equal(t, []int{4, 2, 10}, memory.rawMemory)
+	assert.Equal(t, []int{4, 10, 10}, memory.rawMemory)
 	assert.Equal(t, 10, <-output)
 }
 

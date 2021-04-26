@@ -75,21 +75,65 @@ func (ic Computer) parseOpcode(rawOpcode int) (int, []mode, error) {
 	return opcode, outputModes, nil
 }
 
+func (ic Computer) resolveParameters(memory *Memory, opcode int, opcodeParameters []int, parameterModes []mode) ([]int, error) {
+	resolvedParameters := make([]int, len(opcodeParameters))
+	for index, opcodeParameter := range opcodeParameters {
+		parameterMode := ic.opcodes[opcode].parameters[index]
+		switch parameterModes[index] {
+		case Position:
+			switch parameterMode {
+			case Write:
+				resolvedParameters[index] = opcodeParameter
+			case Read:
+				resolvedParameters[index] = memory.Get(opcodeParameter)
+			default:
+				err := fmt.Errorf("invalid parameter mode: %d", parameterModes[index])
+				return nil, err
+			}
+		case Immediate:
+			if parameterMode == Write {
+				err := fmt.Errorf("write parameter cannot be in immediate mode: %d", opcodeParameter)
+				return nil, err
+			}
+
+			resolvedParameters[index] = opcodeParameter
+		default:
+			err := fmt.Errorf("invalid mode: %d", parameterModes[index])
+			return nil, err
+		}
+	}
+
+	return resolvedParameters, nil
+}
+
 func (ic *Computer) Step() (int, error) {
 	// Get the opcode at the address of the program counter
 	opcode := ic.Memory.Get(ic.programCounter)
 	log.Trace().Int("opcode", opcode).Msg("[COMPUTER] Retrieved opcode")
 
-	// Check if it is a valid opcode
-	if _, ok := ic.opcodes[opcode]; !ok {
-		err := fmt.Errorf("invalid opcode: %d", opcode)
+	// Parse the opcode
+	opcode, parameterModes, err := ic.parseOpcode(opcode)
+	if err != nil {
 		return -1, err
 	}
+	log.
+		Trace().
+		Int("opcode", opcode).
+		// TODO: figure out how to convert this
+		// Ints("parameterModes", parameterModes).
+		Msg("[COMPUTER] Parsed opcode")
 
 	// Get the parameters for the opcode
 	parametersLength := len(ic.opcodes[opcode].parameters)
 	opcodeParameters := ic.Memory.GetRange(ic.programCounter+1, parametersLength)
 	log.Trace().Ints("parameters", opcodeParameters).Msg("[COMPUTER] Retrieved opcode parameters")
+
+	// Resolve the parameters based on the modes
+	opcodeParameters, err = ic.resolveParameters(ic.Memory, opcode, opcodeParameters, parameterModes)
+	if err != nil {
+		return -1, err
+	}
+	log.Trace().Ints("parameters", opcodeParameters).Msg("[COMPUTER] Resolved opcode parameters")
 
 	// Execute the opcode
 	operation := ic.opcodes[opcode]

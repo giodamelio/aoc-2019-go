@@ -94,7 +94,9 @@ func TestResolveParametersErrors(t *testing.T) {
 		name:       "FAKE",
 		opcode:     98,
 		parameters: []readWrite{Read, Read, 2},
-		execute:    func(memory *Memory, parameters []int, input chan int, output chan int) {},
+		execute: func(memory *Memory, parameters []int, input chan int, output chan int) bool {
+			return true
+		},
 	}
 	opcodeParameters, err = computer.resolveParameters(
 		computer.Memory,
@@ -125,6 +127,17 @@ func TestStepInvalidOpcode(t *testing.T) {
 	assert.Equal(t, -1, opcode)
 	assert.Equal(t, "invalid opcode: -1", err.Error())
 	assert.Equal(t, []int{-1, 0, 0, 0}, computer.Memory.rawMemory)
+}
+
+func TestStepNoIncrementInstructionPointer(t *testing.T) {
+	computer := NewComputer([]int{99})
+
+	opcode, err := computer.Step()
+
+	assert.Nil(t, err)
+	assert.Equal(t, 99, opcode)
+	assert.Equal(t, []int{99}, computer.Memory.rawMemory)
+	assert.Equal(t, 0, computer.instructionPointer)
 }
 
 func TestRun(t *testing.T) {

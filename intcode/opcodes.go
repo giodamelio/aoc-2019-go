@@ -22,7 +22,7 @@ type Opcode struct {
 	name       string
 	opcode     int
 	parameters []readWrite
-	execute    func(*Memory, []int, chan int, chan int)
+	execute    func(*Memory, []int, chan int, chan int) bool
 }
 
 var Opcodes map[int]Opcode = map[int]Opcode{
@@ -30,7 +30,7 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		name:       "ADD",
 		opcode:     1,
 		parameters: []readWrite{Read, Read, Write},
-		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
+		execute: func(memory *Memory, parameters []int, input chan int, output chan int) bool {
 			leftHandSide := parameters[0]
 			rightHandSide := parameters[1]
 			result := leftHandSide + rightHandSide
@@ -42,13 +42,15 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 				Int("rightHandSide", rightHandSide).
 				Int("result", result).
 				Msg("[OPCODE] ADD")
+
+			return true
 		},
 	},
 	2: {
 		name:       "MULTIPLY",
 		opcode:     2,
 		parameters: []readWrite{Read, Read, Write},
-		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
+		execute: func(memory *Memory, parameters []int, input chan int, output chan int) bool {
 			leftHandSide := parameters[0]
 			rightHandSide := parameters[1]
 			result := leftHandSide * rightHandSide
@@ -60,13 +62,15 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 				Int("rightHandSide", rightHandSide).
 				Int("result", result).
 				Msg("[OPCODE] MULTIPLY")
+
+			return true
 		},
 	},
 	3: {
 		name:       "INPUT",
 		opcode:     3,
 		parameters: []readWrite{Write},
-		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
+		execute: func(memory *Memory, parameters []int, input chan int, output chan int) bool {
 			value := <-input
 
 			memory.Set(parameters[0], value)
@@ -75,13 +79,15 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 				Debug().
 				Int("input", value).
 				Msg("[OPCODE] INPUT")
+
+			return true
 		},
 	},
 	4: {
 		name:       "OUTPUT",
 		opcode:     4,
 		parameters: []readWrite{Read},
-		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
+		execute: func(memory *Memory, parameters []int, input chan int, output chan int) bool {
 			value := parameters[0]
 
 			output <- value
@@ -90,16 +96,20 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 				Debug().
 				Int("output", value).
 				Msg("[OPCODE] OUTPUT")
+
+			return true
 		},
 	},
 	99: {
 		name:       "HALT",
 		opcode:     99,
 		parameters: []readWrite{},
-		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
+		execute: func(memory *Memory, parameters []int, input chan int, output chan int) bool {
 			log.
 				Debug().
 				Msg("[OPCODE] HALT")
+
+			return false
 		},
 	},
 }

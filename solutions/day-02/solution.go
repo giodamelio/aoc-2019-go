@@ -2,10 +2,8 @@ package main
 
 import (
 	_ "embed"
-	"flag"
 	"io/ioutil"
 	"log"
-	"os"
 	"strconv"
 	"strings"
 
@@ -17,36 +15,6 @@ var discardLogger *log.Logger = log.New(ioutil.Discard, "", 0)
 // Read the raw input
 //go:embed input.txt
 var rawInput string
-
-func main() {
-	log := log.New(os.Stdout, "", 0)
-
-	// Parse input flags
-	partPtr := flag.String("part", "both", "The part you want to run \"1\", \"2\" or \"both\"")
-	flag.Parse()
-
-	// Ensure a valid part
-	if *partPtr != "1" && *partPtr != "2" && *partPtr != "both" {
-		log.Fatal("Part must be 1, 2, or both")
-	}
-
-	// Parse the input
-	parsedInput, err := parseInput(rawInput)
-	if err != nil {
-		log.Fatal("Failed to parse input")
-	}
-
-	if *partPtr == "1" {
-		log.Printf("Part 1 solution: %d", part1(log, parsedInput))
-	}
-	if *partPtr == "2" {
-		log.Printf("Part 2 solution: %d", part2(log, parsedInput))
-	}
-	if *partPtr == "both" {
-		log.Printf("Part 1 solution: %d", part1(log, parsedInput))
-		log.Printf("Part 2 solution: %d", part2(log, parsedInput))
-	}
-}
 
 func parseInput(input string) ([]int, error) {
 	bytes := strings.Split(strings.TrimSpace(input), ",")

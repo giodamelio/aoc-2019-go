@@ -10,7 +10,7 @@ func TestNewComputer(t *testing.T) {
 	computer := NewComputer([]int{1, 2, 3})
 
 	assert.Equal(t, 0, computer.programCounter)
-	assert.Equal(t, []int{1, 2, 3}, computer.memory.rawMemory)
+	assert.Equal(t, []int{1, 2, 3}, computer.Memory.rawMemory)
 }
 
 func TestStep(t *testing.T) {
@@ -20,7 +20,7 @@ func TestStep(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, opcode)
-	assert.Equal(t, []int{2, 0, 0, 0}, computer.memory.rawMemory)
+	assert.Equal(t, []int{2, 0, 0, 0}, computer.Memory.rawMemory)
 }
 
 func TestStepInvalidOpcode(t *testing.T) {
@@ -30,7 +30,7 @@ func TestStepInvalidOpcode(t *testing.T) {
 
 	assert.Equal(t, -1, opcode)
 	assert.Equal(t, "invalid opcode: -1", err.Error())
-	assert.Equal(t, []int{-1, 0, 0, 0}, computer.memory.rawMemory)
+	assert.Equal(t, []int{-1, 0, 0, 0}, computer.Memory.rawMemory)
 }
 
 func TestRun(t *testing.T) {
@@ -38,7 +38,7 @@ func TestRun(t *testing.T) {
 
 	computer.Run()
 
-	assert.Equal(t, 3500, computer.memory.rawMemory[0])
+	assert.Equal(t, 3500, computer.Memory.rawMemory[0])
 }
 
 func TestRunInvalidOpcode(t *testing.T) {

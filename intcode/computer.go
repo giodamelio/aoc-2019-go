@@ -5,7 +5,7 @@ import (
 )
 
 type Computer struct {
-	memory         *Memory
+	Memory         *Memory
 	programCounter int
 	opcodes        map[int]Opcode
 	errorHandler   func(error)
@@ -13,7 +13,7 @@ type Computer struct {
 
 func NewComputer(initialMemory []int) *Computer {
 	comp := new(Computer)
-	comp.memory = newMemory(initialMemory)
+	comp.Memory = newMemory(initialMemory)
 	comp.programCounter = 0
 	comp.opcodes = Opcodes
 
@@ -27,7 +27,7 @@ func NewComputer(initialMemory []int) *Computer {
 
 func (ic *Computer) Step() (int, error) {
 	// Get the opcode at the address of the program counter
-	opcode := ic.memory.Get(ic.programCounter)
+	opcode := ic.Memory.Get(ic.programCounter)
 
 	// Check if it is a valid opcode
 	if _, ok := ic.opcodes[opcode]; !ok {
@@ -36,10 +36,10 @@ func (ic *Computer) Step() (int, error) {
 	}
 
 	// Get the arguments for the opcode
-	opcodeArguments := ic.memory.GetRange(ic.programCounter+1, ic.opcodes[opcode].arguments)
+	opcodeArguments := ic.Memory.GetRange(ic.programCounter+1, ic.opcodes[opcode].arguments)
 
 	// Execute the opcode
-	ic.opcodes[opcode].execute(ic.memory, opcodeArguments)
+	ic.opcodes[opcode].execute(ic.Memory, opcodeArguments)
 
 	// Increment program counter
 	ic.programCounter = ic.programCounter + ic.opcodes[opcode].arguments + 1

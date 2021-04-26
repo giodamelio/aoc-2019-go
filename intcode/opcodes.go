@@ -4,23 +4,30 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type mode int
+
+const (
+	Position mode = iota
+	Immediate
+)
+
 type Opcode struct {
-	name      string
-	opcode    int
-	arguments int
-	execute   func(*Memory, []int, chan int, chan int)
+	name       string
+	opcode     int
+	parameters int
+	execute    func(*Memory, []int, chan int, chan int)
 }
 
 var Opcodes map[int]Opcode = map[int]Opcode{
 	1: {
-		name:      "ADD",
-		opcode:    1,
-		arguments: 3,
-		execute: func(memory *Memory, arguments []int, input chan int, output chan int) {
-			leftHandSide := memory.Get(arguments[0])
-			rightHandSide := memory.Get(arguments[1])
+		name:       "ADD",
+		opcode:     1,
+		parameters: 3,
+		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
+			leftHandSide := memory.Get(parameters[0])
+			rightHandSide := memory.Get(parameters[1])
 			result := leftHandSide + rightHandSide
-			memory.Set(arguments[2], result)
+			memory.Set(parameters[2], result)
 
 			log.
 				Debug().
@@ -31,14 +38,14 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		},
 	},
 	2: {
-		name:      "MULTIPLY",
-		opcode:    2,
-		arguments: 3,
-		execute: func(memory *Memory, arguments []int, input chan int, output chan int) {
-			leftHandSide := memory.Get(arguments[0])
-			rightHandSide := memory.Get(arguments[1])
+		name:       "MULTIPLY",
+		opcode:     2,
+		parameters: 3,
+		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
+			leftHandSide := memory.Get(parameters[0])
+			rightHandSide := memory.Get(parameters[1])
 			result := leftHandSide * rightHandSide
-			memory.Set(arguments[2], result)
+			memory.Set(parameters[2], result)
 
 			log.
 				Debug().
@@ -49,13 +56,13 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		},
 	},
 	3: {
-		name:      "INPUT",
-		opcode:    3,
-		arguments: 1,
-		execute: func(memory *Memory, arguments []int, input chan int, output chan int) {
+		name:       "INPUT",
+		opcode:     3,
+		parameters: 1,
+		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
 			value := <-input
 
-			memory.Set(arguments[0], value)
+			memory.Set(parameters[0], value)
 
 			log.
 				Debug().
@@ -64,11 +71,11 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		},
 	},
 	4: {
-		name:      "OUTPUT",
-		opcode:    4,
-		arguments: 1,
-		execute: func(memory *Memory, arguments []int, input chan int, output chan int) {
-			value := memory.Get(arguments[0])
+		name:       "OUTPUT",
+		opcode:     4,
+		parameters: 1,
+		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
+			value := memory.Get(parameters[0])
 
 			output <- value
 
@@ -79,10 +86,10 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		},
 	},
 	99: {
-		name:      "HALT",
-		opcode:    99,
-		arguments: 0,
-		execute: func(memory *Memory, arguments []int, input chan int, output chan int) {
+		name:       "HALT",
+		opcode:     99,
+		parameters: 0,
+		execute: func(memory *Memory, parameters []int, input chan int, output chan int) {
 			log.
 				Debug().
 				Msg("[OPCODE] HALT")

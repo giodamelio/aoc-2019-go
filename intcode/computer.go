@@ -2,6 +2,7 @@ package intcode
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/rs/zerolog/log"
 )
@@ -34,6 +35,46 @@ func NewComputer(initialMemory []int) *Computer {
 	return comp
 }
 
+func (ic Computer) parseOpcode(rawOpcode int) (int, []mode, error) {
+	// Get opcode from 1s and 10s columns
+	rawOpcodeString := fmt.Sprintf("%02d", rawOpcode)
+	opcode, err := strconv.Atoi(rawOpcodeString[len(rawOpcodeString)-2:])
+	if err != nil {
+		return 0, nil, err
+	}
+
+	// Check if it is a valid opcode
+	opcodeDefinition, ok := ic.opcodes[opcode]
+	if !ok {
+		err := fmt.Errorf("invalid opcode: %d", opcode)
+		return 0, nil, err
+	}
+
+	// Get the number of parameters of that opcode
+	parameterCount := opcodeDefinition.parameters
+
+	// Format the rawOpcode to be as long as the opcode + parameters
+	rawOpcodeStringWithParameterModes := fmt.Sprintf("%0*d", 2+parameterCount, rawOpcode)
+
+	// Get all the mode settings without the opcode itself
+	parameterModeSettings := rawOpcodeStringWithParameterModes[:len(rawOpcodeStringWithParameterModes)-2]
+
+	// Convert the mode numbers to their mode enum
+	// 0 = Position
+	// 1 = Immediate
+	outputModes := make([]mode, len(parameterModeSettings))
+	for i, m := range parameterModeSettings {
+		intM, err := strconv.Atoi(string(m))
+		if err != nil {
+			return 0, nil, err
+		}
+
+		outputModes[i] = mode(intM)
+	}
+
+	return opcode, outputModes, nil
+}
+
 func (ic *Computer) Step() (int, error) {
 	// Get the opcode at the address of the program counter
 	opcode := ic.Memory.Get(ic.programCounter)
@@ -45,17 +86,17 @@ func (ic *Computer) Step() (int, error) {
 		return -1, err
 	}
 
-	// Get the arguments for the opcode
-	opcodeArguments := ic.Memory.GetRange(ic.programCounter+1, ic.opcodes[opcode].arguments)
-	log.Trace().Ints("arguments", opcodeArguments).Msg("[COMPUTER] Retrieved opcode arguments")
+	// Get the parameters for the opcode
+	opcodeParameters := ic.Memory.GetRange(ic.programCounter+1, ic.opcodes[opcode].parameters)
+	log.Trace().Ints("parameters", opcodeParameters).Msg("[COMPUTER] Retrieved opcode parameters")
 
 	// Execute the opcode
 	operation := ic.opcodes[opcode]
 	log.Trace().Str("opcodeName", operation.name).Msg("[COMPUTER] Executing operation")
-	operation.execute(ic.Memory, opcodeArguments, ic.input, ic.output)
+	operation.execute(ic.Memory, opcodeParameters, ic.input, ic.output)
 
 	// Increment program counter
-	ic.programCounter = ic.programCounter + ic.opcodes[opcode].arguments + 1
+	ic.programCounter = ic.programCounter + ic.opcodes[opcode].parameters + 1
 
 	return opcode, nil
 }

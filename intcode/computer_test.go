@@ -21,6 +21,25 @@ func TestNewComputer(t *testing.T) {
 	assert.Equal(t, []int{1, 2, 3}, computer.Memory.rawMemory)
 }
 
+func TestParseOpcode(t *testing.T) {
+	computer := NewComputer([]int{})
+
+	opcodes := []int{2, 1002, 4, 99}
+	for _, opcode := range opcodes {
+		opcode, parameterModes, err := computer.parseOpcode(opcode)
+
+		assert.Nil(t, err)
+		assert.Equal(t, computer.opcodes[opcode].parameters, len(parameterModes))
+	}
+}
+
+func TestParseOpcodeInvalid(t *testing.T) {
+	computer := NewComputer([]int{})
+
+	_, _, err := computer.parseOpcode(1050)
+	assert.Equal(t, err.Error(), "invalid opcode: 50")
+}
+
 func TestStep(t *testing.T) {
 	computer := NewComputer([]int{1, 0, 0, 0})
 

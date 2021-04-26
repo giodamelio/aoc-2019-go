@@ -35,6 +35,17 @@ func NewComputer(initialMemory []int) *Computer {
 	return comp
 }
 
+func reverseOutputModes(input []mode) []mode {
+	inputLength := len(input)
+	output := make([]mode, inputLength)
+
+	for i, item := range input {
+		output[inputLength-i-1] = item
+	}
+
+	return output
+}
+
 func (ic Computer) parseOpcode(rawOpcode int) (int, []mode, error) {
 	// Get opcode from 1s and 10s columns
 	rawOpcodeString := fmt.Sprintf("%02d", rawOpcode)
@@ -72,7 +83,10 @@ func (ic Computer) parseOpcode(rawOpcode int) (int, []mode, error) {
 		outputModes[i] = mode(intM)
 	}
 
-	return opcode, outputModes, nil
+	// Reverse the output modes since they are read right to left
+	reversedOutputModes := reverseOutputModes(outputModes)
+
+	return opcode, reversedOutputModes, nil
 }
 
 func (ic Computer) resolveParameters(memory *Memory, opcode int, opcodeParameters []int, parameterModes []mode) ([]int, error) {

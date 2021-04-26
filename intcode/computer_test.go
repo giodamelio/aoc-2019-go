@@ -21,6 +21,11 @@ func TestNewComputer(t *testing.T) {
 	assert.Equal(t, []int{1, 2, 3}, computer.Memory.rawMemory)
 }
 
+func TestReverOutputModes(t *testing.T) {
+	out := reverseOutputModes([]mode{Immediate, Immediate, Position})
+	assert.Equal(t, []mode{Position, Immediate, Immediate}, out)
+}
+
 func TestParseOpcode(t *testing.T) {
 	computer := NewComputer([]int{})
 
@@ -31,6 +36,14 @@ func TestParseOpcode(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, len(computer.opcodes[opcode].parameters), len(parameterModes))
 	}
+}
+
+func TestParseOpcodeProperlyReversed(t *testing.T) {
+	computer := NewComputer([]int{})
+
+	_, parameterModes, err := computer.parseOpcode(1101)
+	assert.Nil(t, err)
+	assert.Equal(t, []mode{Immediate, Immediate, Position}, parameterModes)
 }
 
 func TestParseOpcodeInvalid(t *testing.T) {
@@ -166,7 +179,7 @@ func TestGetOutputChannel(t *testing.T) {
 
 // Add two numbers
 func TestAddTwoNumber(t *testing.T) {
-	computer := NewComputer([]int{11001, 11, 22, 0, 99})
+	computer := NewComputer([]int{1101, 11, 22, 0, 99})
 
 	computer.Run()
 

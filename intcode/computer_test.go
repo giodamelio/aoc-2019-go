@@ -139,8 +139,46 @@ func TestSendInput(t *testing.T) {
 	assert.Equal(t, []int{3, 3, 99, 10}, computer.Memory.rawMemory)
 }
 
-// Test GetOutputChannel by taking an input, doubling it and outputing the result
 func TestGetOutputChannel(t *testing.T) {
+	computer := NewComputer([]int{104, 10, 99})
+
+	// Listen for the output
+	wait := make(chan bool)
+	go func() {
+		output := <-computer.GetOutputChannel()
+		assert.Equal(t, 10, output)
+		wait <- true
+	}()
+
+	computer.Run()
+
+	assert.Equal(
+		t,
+		[]int{104, 10, 99},
+		computer.Memory.rawMemory,
+	)
+
+	// Make sure the output has been read
+	<-wait
+}
+
+// Some test programs
+
+// Add two numbers
+func TestAddTwoNumber(t *testing.T) {
+	computer := NewComputer([]int{11001, 11, 22, 0, 99})
+
+	computer.Run()
+
+	assert.Equal(
+		t,
+		[]int{33, 11, 22, 0, 99},
+		computer.Memory.rawMemory,
+	)
+}
+
+// Take an input, double it and output it
+func TestDoubleInput(t *testing.T) {
 	computer := NewComputer([]int{3, 0, 2, 2, 0, 0, 4, 0, 99})
 
 	// Number to be doubled

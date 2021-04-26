@@ -11,6 +11,7 @@ type Computer struct {
 	programCounter int
 	opcodes        map[int]Opcode
 	errorHandler   func(error)
+	input          chan int
 }
 
 func NewComputer(initialMemory []int) *Computer {
@@ -20,6 +21,7 @@ func NewComputer(initialMemory []int) *Computer {
 	comp.Memory = newMemory(initialMemory)
 	comp.programCounter = 0
 	comp.opcodes = Opcodes
+	comp.input = make(chan int)
 
 	// Default to panicing when things go wrong
 	comp.errorHandler = func(err error) {
@@ -48,7 +50,7 @@ func (ic *Computer) Step() (int, error) {
 	// Execute the opcode
 	operation := ic.opcodes[opcode]
 	log.Trace().Str("opcodeName", operation.name).Msg("[COMPUTER] Executing operation")
-	operation.execute(ic.Memory, opcodeArguments)
+	operation.execute(ic.Memory, opcodeArguments, ic.input)
 
 	// Increment program counter
 	ic.programCounter = ic.programCounter + ic.opcodes[opcode].arguments + 1
@@ -68,4 +70,10 @@ func (ic Computer) Run() {
 			break
 		}
 	}
+}
+
+func (ic *Computer) SendInput(input int) {
+	go func() {
+		ic.input <- input
+	}()
 }

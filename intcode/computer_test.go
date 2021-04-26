@@ -56,3 +56,12 @@ func TestRunInvalidOpcode(t *testing.T) {
 		computer.Run()
 	})
 }
+
+func TestSendInput(t *testing.T) {
+	computer := NewComputer([]int{3, 3, 99, 0})
+
+	computer.SendInput(10)
+	computer.Run()
+
+	assert.Equal(t, []int{3, 3, 99, 10}, computer.Memory.rawMemory)
+}

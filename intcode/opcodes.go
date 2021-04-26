@@ -1,12 +1,14 @@
 package intcode
 
-import "github.com/rs/zerolog/log"
+import (
+	"github.com/rs/zerolog/log"
+)
 
 type Opcode struct {
 	name      string
 	opcode    int
 	arguments int
-	execute   func(*Memory, []int)
+	execute   func(*Memory, []int, chan int)
 }
 
 var Opcodes map[int]Opcode = map[int]Opcode{
@@ -14,7 +16,7 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		name:      "ADD",
 		opcode:    1,
 		arguments: 3,
-		execute: func(memory *Memory, arguments []int) {
+		execute: func(memory *Memory, arguments []int, input chan int) {
 			leftHandSide := memory.Get(arguments[0])
 			rightHandSide := memory.Get(arguments[1])
 			output := leftHandSide + rightHandSide
@@ -32,7 +34,7 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		name:      "MULTIPLY",
 		opcode:    2,
 		arguments: 3,
-		execute: func(memory *Memory, arguments []int) {
+		execute: func(memory *Memory, arguments []int, input chan int) {
 			leftHandSide := memory.Get(arguments[0])
 			rightHandSide := memory.Get(arguments[1])
 			output := leftHandSide * rightHandSide
@@ -46,11 +48,26 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 				Msg("[OPCODE] MULTIPLY")
 		},
 	},
+	3: {
+		name:      "INPUT",
+		opcode:    3,
+		arguments: 1,
+		execute: func(memory *Memory, arguments []int, input chan int) {
+			value := <-input
+
+			memory.Set(arguments[0], value)
+
+			log.
+				Debug().
+				Int("input", value).
+				Msg("[OPCODE] INPUT")
+		},
+	},
 	99: {
 		name:      "HALT",
 		opcode:    99,
 		arguments: 0,
-		execute: func(memory *Memory, arguments []int) {
+		execute: func(memory *Memory, arguments []int, input chan int) {
 			log.
 				Debug().
 				Msg("[OPCODE] HALT")

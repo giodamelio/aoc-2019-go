@@ -2,8 +2,21 @@ linters:
   fast: false
   disable-all: false
   disable:
+    # Deprecated by lint creator
     - maligned
     - interfacer
+    # Tests seem to run fine and fast without parallel
+    - paralleltest
+    # Would be good when developing a library, but not worth the trouble here
+    - wrapcheck
+    # Probably good, but annoys me
+    - goerr113
+    - gochecknoglobals
+    - gomnd
+    # I use these in my unit tests, there is probably a better way to do this though
+    - gochecknoinits
+    # Should probably do this too, but again, not writing an actual library
+    - testpackage
   presets:
     - complexity
     - error

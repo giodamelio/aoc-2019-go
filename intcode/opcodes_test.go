@@ -120,6 +120,26 @@ func TestLessThan(t *testing.T) {
 	assert.Equal(t, 4, computer.instructionPointer)
 }
 
+func TestEquals(t *testing.T) {
+	opcodeEquals := Opcodes[8]
+
+	// Test equals
+	computer := NewComputer([]int{1108, 10, 10, 0, 99})
+
+	opcodeEquals.execute(computer, opcodeEquals, computer.Memory.rawMemory[1:])
+
+	assert.Equal(t, []int{1, 10, 10, 0, 99}, computer.Memory.rawMemory)
+	assert.Equal(t, 4, computer.instructionPointer)
+
+	// Test not equals
+	computer = NewComputer([]int{1108, 10, 20, 0, 99})
+
+	opcodeEquals.execute(computer, opcodeEquals, computer.Memory.rawMemory[1:])
+
+	assert.Equal(t, []int{0, 10, 20, 0, 99}, computer.Memory.rawMemory)
+	assert.Equal(t, 4, computer.instructionPointer)
+}
+
 func TestHalt(t *testing.T) {
 	opcodeHalt := Opcodes[99]
 	computer := NewComputer([]int{99})

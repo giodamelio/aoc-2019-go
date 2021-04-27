@@ -176,6 +176,35 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 			operation.incrementInstructionPointer(computer)
 		},
 	},
+	8: {
+		name:       "EQUALS",
+		opcode:     8,
+		parameters: []readWrite{Read, Read, Write},
+		execute: func(computer *Computer, operation Opcode, parameters []int) {
+			lhs := parameters[0]
+			rhs := parameters[1]
+			outputAddress := parameters[2]
+
+			var output int
+			if lhs == rhs {
+				output = 1
+			} else {
+				output = 0
+			}
+
+			log.
+				Debug().
+				Int("lhs", lhs).
+				Int("rhs", rhs).
+				Int("outputAddress", outputAddress).
+				Int("output", output).
+				Msg("[OPCODE] EQUALS")
+
+			computer.Memory.Set(outputAddress, output)
+
+			operation.incrementInstructionPointer(computer)
+		},
+	},
 	99: {
 		name:       "HALT",
 		opcode:     99,

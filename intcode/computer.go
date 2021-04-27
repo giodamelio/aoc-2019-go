@@ -19,8 +19,10 @@ type Computer struct {
 func NewComputer(initialMemory []int) *Computer {
 	log.Debug().Msg("[COMPUTER] Computer created")
 
+	copyOfInitialMemory := copyMemory(initialMemory)
+
 	comp := new(Computer)
-	comp.Memory = newMemory(initialMemory)
+	comp.Memory = newMemory(copyOfInitialMemory)
 	comp.instructionPointer = 0
 	comp.opcodes = Opcodes
 	comp.input = make(chan int)

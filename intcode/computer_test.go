@@ -21,6 +21,16 @@ func TestNewComputer(t *testing.T) {
 	assert.Equal(t, []int{1, 2, 3}, computer.Memory.rawMemory)
 }
 
+func TestNewComputerNotModifyInitialMemory(t *testing.T) {
+	program := []int{1101, 1, 2, 0, 99}
+	computer := NewComputer(program)
+
+	computer.Run()
+
+	assert.Equal(t, []int{3, 1, 2, 0, 99}, computer.Memory.rawMemory)
+	assert.Equal(t, []int{1101, 1, 2, 0, 99}, program)
+}
+
 func TestReverOutputModes(t *testing.T) {
 	out := reverseOutputModes([]mode{Immediate, Immediate, Position})
 	assert.Equal(t, []mode{Position, Immediate, Immediate}, out)

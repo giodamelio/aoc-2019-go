@@ -1,0 +1,18 @@
+linters:
+  fast: false
+  disable-all: false
+  disable:
+    - maligned
+    - interfacer
+  presets:
+    - complexity
+    - error
+    - format
+    - import
+    - metalinter
+    - module
+    - performance
+    - sql
+    - style
+    - test
+    - unused

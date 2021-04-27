@@ -109,6 +109,16 @@ func TestResolveParametersErrors(t *testing.T) {
 	assert.Nil(t, opcodeParameters)
 }
 
+func TestSetInstructionPointer(t *testing.T) {
+	computer := NewComputer([]int{1, 0, 0, 0})
+
+	assert.Equal(t, 0, computer.instructionPointer)
+
+	computer.SetInstructionPointer(3)
+
+	assert.Equal(t, 3, computer.instructionPointer)
+}
+
 func TestStep(t *testing.T) {
 	computer := NewComputer([]int{1, 0, 0, 0})
 

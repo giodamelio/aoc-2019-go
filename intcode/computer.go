@@ -120,6 +120,10 @@ func (ic Computer) resolveParameters(memory *Memory, opcode int, opcodeParameter
 	return resolvedParameters, nil
 }
 
+func (ic *Computer) SetInstructionPointer(address int) {
+	ic.instructionPointer = address
+}
+
 func (ic *Computer) Step() (int, error) {
 	// Get the opcode at the address of the instruction pointer
 	opcode := ic.Memory.Get(ic.instructionPointer)

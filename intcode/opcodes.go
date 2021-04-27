@@ -140,11 +140,40 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 				Debug().
 				Int("condition", condition).
 				Int("address", address).
-				Msg("[OPCODE] JUMP-IF-TRUE")
+				Msg("[OPCODE] JUMP-IF-FALSE")
 
 			if condition == 0 {
 				computer.SetInstructionPointer(address)
 			}
+		},
+	},
+	7: {
+		name:       "LESS-THAN",
+		opcode:     7,
+		parameters: []readWrite{Read, Read, Write},
+		execute: func(computer *Computer, operation Opcode, parameters []int) {
+			lhs := parameters[0]
+			rhs := parameters[1]
+			outputAddress := parameters[2]
+
+			var output int
+			if lhs < rhs {
+				output = 1
+			} else {
+				output = 0
+			}
+
+			log.
+				Debug().
+				Int("lhs", lhs).
+				Int("rhs", rhs).
+				Int("outputAddress", outputAddress).
+				Int("output", output).
+				Msg("[OPCODE] LESS-THAN")
+
+			computer.Memory.Set(outputAddress, output)
+
+			operation.incrementInstructionPointer(computer)
 		},
 	},
 	99: {

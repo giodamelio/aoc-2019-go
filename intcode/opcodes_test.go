@@ -100,6 +100,26 @@ func TestJumpIfFalse(t *testing.T) {
 	assert.Equal(t, 22, computer.instructionPointer)
 }
 
+func TestLessThan(t *testing.T) {
+	opcodeLessThan := Opcodes[7]
+
+	// Test less then case
+	computer := NewComputer([]int{1107, 10, 20, 0, 99})
+
+	opcodeLessThan.execute(computer, opcodeLessThan, computer.Memory.rawMemory[1:])
+
+	assert.Equal(t, []int{1, 10, 20, 0, 99}, computer.Memory.rawMemory)
+	assert.Equal(t, 4, computer.instructionPointer)
+
+	// Test not less then case
+	computer = NewComputer([]int{1107, 20, 10, 0, 99})
+
+	opcodeLessThan.execute(computer, opcodeLessThan, computer.Memory.rawMemory[1:])
+
+	assert.Equal(t, []int{0, 20, 10, 0, 99}, computer.Memory.rawMemory)
+	assert.Equal(t, 4, computer.instructionPointer)
+}
+
 func TestHalt(t *testing.T) {
 	opcodeHalt := Opcodes[99]
 	computer := NewComputer([]int{99})

@@ -14,6 +14,14 @@ func init() {
 	zerolog.SetGlobalLevel(zerolog.TraceLevel)
 }
 
+func TestLength(t *testing.T) {
+	opcodeAdd := Opcodes[1]
+	opcodeHalt := Opcodes[99]
+
+	assert.Equal(t, 4, opcodeAdd.length())
+	assert.Equal(t, 1, opcodeHalt.length())
+}
+
 func TestAdd(t *testing.T) {
 	opcodeAdd := Opcodes[1]
 	computer := NewComputer([]int{1, 1, 1, 0})

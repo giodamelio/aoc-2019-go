@@ -25,6 +25,11 @@ type Opcode struct {
 	execute    func(*Computer, Opcode, []int) bool
 }
 
+// The total length of the opcode including parameters
+func (o Opcode) length() int {
+	return 1 + len(o.parameters)
+}
+
 var Opcodes map[int]Opcode = map[int]Opcode{
 	1: {
 		name:       "ADD",

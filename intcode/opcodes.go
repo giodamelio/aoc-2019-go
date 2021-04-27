@@ -80,13 +80,15 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		opcode:     3,
 		parameters: []readWrite{Write},
 		execute: func(computer *Computer, operation Opcode, parameters []int) {
+			address := parameters[0]
 			value := <-computer.input
 
-			computer.Memory.Set(parameters[0], value)
+			computer.Memory.Set(address, value)
 
 			log.
 				Debug().
 				Int("input", value).
+				Int("address", address).
 				Msg("[OPCODE] INPUT")
 
 			operation.incrementInstructionPointer(computer)
@@ -125,6 +127,8 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 
 			if condition != 0 {
 				computer.SetInstructionPointer(address)
+			} else {
+				operation.incrementInstructionPointer(computer)
 			}
 		},
 	},
@@ -144,6 +148,8 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 
 			if condition == 0 {
 				computer.SetInstructionPointer(address)
+			} else {
+				operation.incrementInstructionPointer(computer)
 			}
 		},
 	},

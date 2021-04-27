@@ -82,22 +82,42 @@ func TestOutput(t *testing.T) {
 
 func TestJumpIfTrue(t *testing.T) {
 	opcodeJumpIfTrue := Opcodes[5]
+
+	// Jump case
 	computer := NewComputer([]int{1105, 1, 22, 99})
 
 	opcodeJumpIfTrue.execute(computer, opcodeJumpIfTrue, computer.Memory.rawMemory[1:])
 
 	assert.Equal(t, []int{1105, 1, 22, 99}, computer.Memory.rawMemory)
 	assert.Equal(t, 22, computer.instructionPointer)
+
+	// Continue case
+	computer = NewComputer([]int{1105, 0, 22, 99})
+
+	opcodeJumpIfTrue.execute(computer, opcodeJumpIfTrue, computer.Memory.rawMemory[1:])
+
+	assert.Equal(t, []int{1105, 0, 22, 99}, computer.Memory.rawMemory)
+	assert.Equal(t, 3, computer.instructionPointer)
 }
 
 func TestJumpIfFalse(t *testing.T) {
 	opcodeJumpIfFalse := Opcodes[6]
+
+	// Jump case
 	computer := NewComputer([]int{1106, 0, 22, 99})
 
 	opcodeJumpIfFalse.execute(computer, opcodeJumpIfFalse, computer.Memory.rawMemory[1:])
 
 	assert.Equal(t, []int{1106, 0, 22, 99}, computer.Memory.rawMemory)
 	assert.Equal(t, 22, computer.instructionPointer)
+
+	// Continue case
+	computer = NewComputer([]int{1106, 1, 22, 99})
+
+	opcodeJumpIfFalse.execute(computer, opcodeJumpIfFalse, computer.Memory.rawMemory[1:])
+
+	assert.Equal(t, []int{1106, 1, 22, 99}, computer.Memory.rawMemory)
+	assert.Equal(t, 3, computer.instructionPointer)
 }
 
 func TestLessThan(t *testing.T) {

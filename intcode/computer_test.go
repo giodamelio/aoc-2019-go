@@ -238,14 +238,36 @@ func TestDoubleInput(t *testing.T) {
 	<-wait
 }
 
-// func TestIsInputTrue(t *testing.T) {
-// 	computer := NewComputer([]int{1105, 1, 4, 99, 1101, 0, 3141, 0})
+// Test if the input is greater then zero
+func TestIsGreaterThenZero(t *testing.T) {
+	computer := NewComputer([]int{
+		// Program
+		3, 12, //           INPUT					Read input to address 12
+		6, 12, 15, //       JUMP-IF-FALSE	If the contents of address 12 are not zero
+		//                                jump to the location in address 15 (address 9)
+		1, 13, 14, 13, //   ADD						Add the values from addresses 13 and 14 and put them in address 13
+		4, 13, //           OUTPUT				Output the the value of address 13
+		99, //              HALT
 
-// 	computer.Run()
+		// Data
+		-1, // Address 12
+		0,  //         13
+		1,  //         14
+		9,  //         15
+	})
 
-// 	assert.Equal(
-// 		t,
-// 		[]int{33, 11, 22, 0, 99},
-// 		computer.Memory.rawMemory,
-// 	)
-// }
+	computer.SendInput(11)
+
+	// Listen for the output
+	wait := make(chan bool)
+	go func() {
+		output := <-computer.GetOutputChannel()
+		assert.Equal(t, 22, output)
+		wait <- true
+	}()
+
+	computer.Run()
+
+	// Make sure the output has been read
+	<-wait
+}

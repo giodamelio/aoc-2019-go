@@ -16,54 +16,56 @@ func init() {
 
 func TestAdd(t *testing.T) {
 	opcodeAdd := Opcodes[1]
-	memory := newMemory([]int{1, 1, 1, 0})
+	computer := NewComputer([]int{1, 1, 1, 0})
 
-	opcodeAdd.execute(memory, memory.rawMemory[1:], nil, nil)
+	opcodeAdd.execute(computer, computer.Memory.rawMemory[1:])
 
-	assert.Equal(t, []int{2, 1, 1, 0}, memory.rawMemory)
+	assert.Equal(t, []int{2, 1, 1, 0}, computer.Memory.rawMemory)
 }
 
 func TestMultiply(t *testing.T) {
 	opcodeMultiply := Opcodes[2]
-	memory := newMemory([]int{2, 2, 2, 0})
+	computer := NewComputer([]int{2, 2, 2, 0})
 
-	opcodeMultiply.execute(memory, memory.rawMemory[1:], nil, nil)
+	opcodeMultiply.execute(computer, computer.Memory.rawMemory[1:])
 
-	assert.Equal(t, []int{4, 2, 2, 0}, memory.rawMemory)
+	assert.Equal(t, []int{4, 2, 2, 0}, computer.Memory.rawMemory)
 }
 
 func TestInput(t *testing.T) {
 	opcodeInput := Opcodes[3]
-	memory := newMemory([]int{3, 2, 0})
+	computer := NewComputer([]int{3, 2, 0})
 
 	input := make(chan int)
+	computer.input = input
 
 	go func() {
 		input <- 10
 	}()
 
-	opcodeInput.execute(memory, memory.rawMemory[1:], input, nil)
+	opcodeInput.execute(computer, computer.Memory.rawMemory[1:])
 
-	assert.Equal(t, []int{3, 2, 10}, memory.rawMemory)
+	assert.Equal(t, []int{3, 2, 10}, computer.Memory.rawMemory)
 }
 
 func TestOutput(t *testing.T) {
 	opcodeOutput := Opcodes[4]
-	memory := newMemory([]int{4, 10, 10})
+	computer := NewComputer([]int{4, 10, 10})
 
 	output := make(chan int, 1)
+	computer.output = output
 
-	opcodeOutput.execute(memory, memory.rawMemory[1:], nil, output)
+	opcodeOutput.execute(computer, computer.Memory.rawMemory[1:])
 
-	assert.Equal(t, []int{4, 10, 10}, memory.rawMemory)
+	assert.Equal(t, []int{4, 10, 10}, computer.Memory.rawMemory)
 	assert.Equal(t, 10, <-output)
 }
 
 func TestHalt(t *testing.T) {
 	opcodeHalt := Opcodes[99]
-	memory := newMemory([]int{99})
+	computer := NewComputer([]int{99})
 
-	opcodeHalt.execute(memory, []int{}, nil, nil)
+	opcodeHalt.execute(computer, []int{})
 
-	assert.Equal(t, []int{99}, memory.rawMemory)
+	assert.Equal(t, []int{99}, computer.Memory.rawMemory)
 }

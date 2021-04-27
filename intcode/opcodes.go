@@ -22,7 +22,7 @@ type Opcode struct {
 	name       string
 	opcode     int
 	parameters []readWrite
-	execute    func(*Computer, Opcode, []int) bool
+	execute    func(*Computer, Opcode, []int)
 }
 
 // The total length of the opcode including parameters
@@ -30,12 +30,16 @@ func (o Opcode) length() int {
 	return 1 + len(o.parameters)
 }
 
+func (o Opcode) incrementInstructionPointer(computer *Computer) {
+	computer.SetInstructionPointer(computer.instructionPointer + o.length())
+}
+
 var Opcodes map[int]Opcode = map[int]Opcode{
 	1: {
 		name:       "ADD",
 		opcode:     1,
 		parameters: []readWrite{Read, Read, Write},
-		execute: func(computer *Computer, operation Opcode, parameters []int) bool {
+		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			leftHandSide := parameters[0]
 			rightHandSide := parameters[1]
 			result := leftHandSide + rightHandSide
@@ -48,14 +52,14 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 				Int("result", result).
 				Msg("[OPCODE] ADD")
 
-			return true
+			operation.incrementInstructionPointer(computer)
 		},
 	},
 	2: {
 		name:       "MULTIPLY",
 		opcode:     2,
 		parameters: []readWrite{Read, Read, Write},
-		execute: func(computer *Computer, operation Opcode, parameters []int) bool {
+		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			leftHandSide := parameters[0]
 			rightHandSide := parameters[1]
 			result := leftHandSide * rightHandSide
@@ -68,14 +72,14 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 				Int("result", result).
 				Msg("[OPCODE] MULTIPLY")
 
-			return true
+			operation.incrementInstructionPointer(computer)
 		},
 	},
 	3: {
 		name:       "INPUT",
 		opcode:     3,
 		parameters: []readWrite{Write},
-		execute: func(computer *Computer, operation Opcode, parameters []int) bool {
+		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			value := <-computer.input
 
 			computer.Memory.Set(parameters[0], value)
@@ -85,14 +89,14 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 				Int("input", value).
 				Msg("[OPCODE] INPUT")
 
-			return true
+			operation.incrementInstructionPointer(computer)
 		},
 	},
 	4: {
 		name:       "OUTPUT",
 		opcode:     4,
 		parameters: []readWrite{Read},
-		execute: func(computer *Computer, operation Opcode, parameters []int) bool {
+		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			value := parameters[0]
 
 			computer.output <- value
@@ -102,19 +106,17 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 				Int("output", value).
 				Msg("[OPCODE] OUTPUT")
 
-			return true
+			operation.incrementInstructionPointer(computer)
 		},
 	},
 	99: {
 		name:       "HALT",
 		opcode:     99,
 		parameters: []readWrite{},
-		execute: func(computer *Computer, operation Opcode, parameters []int) bool {
+		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			log.
 				Debug().
 				Msg("[OPCODE] HALT")
-
-			return false
 		},
 	},
 }

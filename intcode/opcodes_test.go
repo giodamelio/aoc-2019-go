@@ -22,6 +22,17 @@ func TestLength(t *testing.T) {
 	assert.Equal(t, 1, opcodeHalt.length())
 }
 
+func TestIncrementInstructionPointer(t *testing.T) {
+	opcodeAdd := Opcodes[1]
+	computer := NewComputer([]int{1, 1, 1, 0})
+
+	assert.Equal(t, 0, computer.instructionPointer)
+
+	opcodeAdd.incrementInstructionPointer(computer)
+
+	assert.Equal(t, 4, computer.instructionPointer)
+}
+
 func TestAdd(t *testing.T) {
 	opcodeAdd := Opcodes[1]
 	computer := NewComputer([]int{1, 1, 1, 0})

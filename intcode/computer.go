@@ -156,12 +156,7 @@ func (ic *Computer) Step() (int, error) {
 	// Execute the opcode
 	operation := ic.opcodes[opcode]
 	log.Trace().Str("opcodeName", operation.name).Msg("[COMPUTER] Executing operation")
-	shouldIncrementInstructionPointer := operation.execute(ic, operation, opcodeParameters)
-
-	// Increment the instruction counter if necessary
-	if shouldIncrementInstructionPointer {
-		ic.instructionPointer = ic.instructionPointer + parametersLength + 1
-	}
+	operation.execute(ic, operation, opcodeParameters)
 
 	return opcode, nil
 }

@@ -18,7 +18,7 @@ func TestAdd(t *testing.T) {
 	opcodeAdd := Opcodes[1]
 	computer := NewComputer([]int{1, 1, 1, 0})
 
-	opcodeAdd.execute(computer, computer.Memory.rawMemory[1:])
+	opcodeAdd.execute(computer, opcodeAdd, computer.Memory.rawMemory[1:])
 
 	assert.Equal(t, []int{2, 1, 1, 0}, computer.Memory.rawMemory)
 }
@@ -27,7 +27,7 @@ func TestMultiply(t *testing.T) {
 	opcodeMultiply := Opcodes[2]
 	computer := NewComputer([]int{2, 2, 2, 0})
 
-	opcodeMultiply.execute(computer, computer.Memory.rawMemory[1:])
+	opcodeMultiply.execute(computer, opcodeMultiply, computer.Memory.rawMemory[1:])
 
 	assert.Equal(t, []int{4, 2, 2, 0}, computer.Memory.rawMemory)
 }
@@ -43,7 +43,7 @@ func TestInput(t *testing.T) {
 		input <- 10
 	}()
 
-	opcodeInput.execute(computer, computer.Memory.rawMemory[1:])
+	opcodeInput.execute(computer, opcodeInput, computer.Memory.rawMemory[1:])
 
 	assert.Equal(t, []int{3, 2, 10}, computer.Memory.rawMemory)
 }
@@ -55,7 +55,7 @@ func TestOutput(t *testing.T) {
 	output := make(chan int, 1)
 	computer.output = output
 
-	opcodeOutput.execute(computer, computer.Memory.rawMemory[1:])
+	opcodeOutput.execute(computer, opcodeOutput, computer.Memory.rawMemory[1:])
 
 	assert.Equal(t, []int{4, 10, 10}, computer.Memory.rawMemory)
 	assert.Equal(t, 10, <-output)
@@ -65,7 +65,7 @@ func TestHalt(t *testing.T) {
 	opcodeHalt := Opcodes[99]
 	computer := NewComputer([]int{99})
 
-	opcodeHalt.execute(computer, []int{})
+	opcodeHalt.execute(computer, opcodeHalt, []int{})
 
 	assert.Equal(t, []int{99}, computer.Memory.rawMemory)
 }

@@ -94,7 +94,7 @@ func TestResolveParametersErrors(t *testing.T) {
 		name:       "FAKE",
 		opcode:     98,
 		parameters: []readWrite{Read, Read, 2},
-		execute: func(computer *Computer, parameters []int) bool {
+		execute: func(computer *Computer, operation Opcode, parameters []int) bool {
 			return true
 		},
 	}

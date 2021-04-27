@@ -22,7 +22,7 @@ type Opcode struct {
 	name       string
 	opcode     int
 	parameters []readWrite
-	execute    func(*Computer, []int) bool
+	execute    func(*Computer, Opcode, []int) bool
 }
 
 var Opcodes map[int]Opcode = map[int]Opcode{
@@ -30,7 +30,7 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		name:       "ADD",
 		opcode:     1,
 		parameters: []readWrite{Read, Read, Write},
-		execute: func(computer *Computer, parameters []int) bool {
+		execute: func(computer *Computer, operation Opcode, parameters []int) bool {
 			leftHandSide := parameters[0]
 			rightHandSide := parameters[1]
 			result := leftHandSide + rightHandSide
@@ -50,7 +50,7 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		name:       "MULTIPLY",
 		opcode:     2,
 		parameters: []readWrite{Read, Read, Write},
-		execute: func(computer *Computer, parameters []int) bool {
+		execute: func(computer *Computer, operation Opcode, parameters []int) bool {
 			leftHandSide := parameters[0]
 			rightHandSide := parameters[1]
 			result := leftHandSide * rightHandSide
@@ -70,7 +70,7 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		name:       "INPUT",
 		opcode:     3,
 		parameters: []readWrite{Write},
-		execute: func(computer *Computer, parameters []int) bool {
+		execute: func(computer *Computer, operation Opcode, parameters []int) bool {
 			value := <-computer.input
 
 			computer.Memory.Set(parameters[0], value)
@@ -87,7 +87,7 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		name:       "OUTPUT",
 		opcode:     4,
 		parameters: []readWrite{Read},
-		execute: func(computer *Computer, parameters []int) bool {
+		execute: func(computer *Computer, operation Opcode, parameters []int) bool {
 			value := parameters[0]
 
 			computer.output <- value
@@ -104,7 +104,7 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 		name:       "HALT",
 		opcode:     99,
 		parameters: []readWrite{},
-		execute: func(computer *Computer, parameters []int) bool {
+		execute: func(computer *Computer, operation Opcode, parameters []int) bool {
 			log.
 				Debug().
 				Msg("[OPCODE] HALT")

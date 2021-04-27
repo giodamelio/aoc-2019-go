@@ -109,6 +109,25 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 			operation.incrementInstructionPointer(computer)
 		},
 	},
+	5: {
+		name:       "JUMP-IF-TRUE",
+		opcode:     5,
+		parameters: []readWrite{Read, Read},
+		execute: func(computer *Computer, operation Opcode, parameters []int) {
+			condition := parameters[0]
+			address := parameters[1]
+
+			log.
+				Debug().
+				Int("condition", condition).
+				Int("address", address).
+				Msg("[OPCODE] JUMP-IF-TRUE")
+
+			if condition != 0 {
+				computer.SetInstructionPointer(address)
+			}
+		},
+	},
 	99: {
 		name:       "HALT",
 		opcode:     99,

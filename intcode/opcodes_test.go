@@ -80,6 +80,16 @@ func TestOutput(t *testing.T) {
 	assert.Equal(t, 10, <-output)
 }
 
+func TestJumpIfTrue(t *testing.T) {
+	opcodeJumpIfTrue := Opcodes[5]
+	computer := NewComputer([]int{1105, 1, 22, 99})
+
+	opcodeJumpIfTrue.execute(computer, opcodeJumpIfTrue, computer.Memory.rawMemory[1:])
+
+	assert.Equal(t, []int{1105, 1, 22, 99}, computer.Memory.rawMemory)
+	assert.Equal(t, 22, computer.instructionPointer)
+}
+
 func TestHalt(t *testing.T) {
 	opcodeHalt := Opcodes[99]
 	computer := NewComputer([]int{99})

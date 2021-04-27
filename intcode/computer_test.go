@@ -237,3 +237,15 @@ func TestDoubleInput(t *testing.T) {
 	// Make sure the output has been read
 	<-wait
 }
+
+// func TestIsInputTrue(t *testing.T) {
+// 	computer := NewComputer([]int{1105, 1, 4, 99, 1101, 0, 3141, 0})
+
+// 	computer.Run()
+
+// 	assert.Equal(
+// 		t,
+// 		[]int{33, 11, 22, 0, 99},
+// 		computer.Memory.rawMemory,
+// 	)
+// }

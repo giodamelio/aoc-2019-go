@@ -18,6 +18,18 @@ const (
 	Write
 )
 
+const (
+	ADD         = 1
+	MULTIPLY    = 2
+	INPUT       = 3
+	OUTPUT      = 4
+	JUMPIFTRUE  = 5
+	JUMPIFFALSE = 6
+	LESSTHAN    = 7
+	EQUALS      = 8
+	HALT        = 99
+)
+
 type Opcode struct {
 	name       string
 	opcode     int
@@ -25,7 +37,7 @@ type Opcode struct {
 	execute    func(*Computer, Opcode, []int)
 }
 
-// The total length of the opcode including parameters
+// The total length of the opcode including parameters.
 func (o Opcode) length() int {
 	return 1 + len(o.parameters)
 }
@@ -34,10 +46,10 @@ func (o Opcode) incrementInstructionPointer(computer *Computer) {
 	computer.SetInstructionPointer(computer.instructionPointer + o.length())
 }
 
-var Opcodes map[int]Opcode = map[int]Opcode{
-	1: {
+var Opcodes = map[int]Opcode{
+	ADD: {
 		name:       "ADD",
-		opcode:     1,
+		opcode:     ADD,
 		parameters: []readWrite{Read, Read, Write},
 		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			leftHandSide := parameters[0]
@@ -55,9 +67,9 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 			operation.incrementInstructionPointer(computer)
 		},
 	},
-	2: {
+	MULTIPLY: {
 		name:       "MULTIPLY",
-		opcode:     2,
+		opcode:     MULTIPLY,
 		parameters: []readWrite{Read, Read, Write},
 		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			leftHandSide := parameters[0]
@@ -75,9 +87,9 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 			operation.incrementInstructionPointer(computer)
 		},
 	},
-	3: {
+	INPUT: {
 		name:       "INPUT",
-		opcode:     3,
+		opcode:     INPUT,
 		parameters: []readWrite{Write},
 		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			address := parameters[0]
@@ -94,9 +106,9 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 			operation.incrementInstructionPointer(computer)
 		},
 	},
-	4: {
+	OUTPUT: {
 		name:       "OUTPUT",
-		opcode:     4,
+		opcode:     OUTPUT,
 		parameters: []readWrite{Read},
 		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			value := parameters[0]
@@ -111,9 +123,9 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 			operation.incrementInstructionPointer(computer)
 		},
 	},
-	5: {
+	JUMPIFTRUE: {
 		name:       "JUMP-IF-TRUE",
-		opcode:     5,
+		opcode:     JUMPIFTRUE,
 		parameters: []readWrite{Read, Read},
 		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			condition := parameters[0]
@@ -132,9 +144,9 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 			}
 		},
 	},
-	6: {
+	JUMPIFFALSE: {
 		name:       "JUMP-IF-FALSE",
-		opcode:     6,
+		opcode:     JUMPIFFALSE,
 		parameters: []readWrite{Read, Read},
 		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			condition := parameters[0]
@@ -153,9 +165,9 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 			}
 		},
 	},
-	7: {
+	LESSTHAN: {
 		name:       "LESS-THAN",
-		opcode:     7,
+		opcode:     LESSTHAN,
 		parameters: []readWrite{Read, Read, Write},
 		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			lhs := parameters[0]
@@ -182,9 +194,9 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 			operation.incrementInstructionPointer(computer)
 		},
 	},
-	8: {
+	EQUALS: {
 		name:       "EQUALS",
-		opcode:     8,
+		opcode:     EQUALS,
 		parameters: []readWrite{Read, Read, Write},
 		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			lhs := parameters[0]
@@ -211,9 +223,9 @@ var Opcodes map[int]Opcode = map[int]Opcode{
 			operation.incrementInstructionPointer(computer)
 		},
 	},
-	99: {
+	HALT: {
 		name:       "HALT",
-		opcode:     99,
+		opcode:     HALT,
 		parameters: []readWrite{},
 		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			log.

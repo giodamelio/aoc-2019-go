@@ -10,7 +10,11 @@ import (
 )
 
 func init() {
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, NoColor: true})
+	out := zerolog.NewConsoleWriter()
+	out.Out = os.Stderr
+	out.NoColor = true
+	log.Logger = log.Output(out)
+
 	zerolog.SetGlobalLevel(zerolog.TraceLevel)
 }
 

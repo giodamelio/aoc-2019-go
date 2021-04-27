@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var discardLog *log.Logger = log.New(ioutil.Discard, "", 0)
+var discardLog = log.New(ioutil.Discard, "", 0)
 
 func TestParseInput(t *testing.T) {
 	parsedInput, err := parseInput("1\n2\n3\n")

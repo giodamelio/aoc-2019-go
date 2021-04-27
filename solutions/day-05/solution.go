@@ -22,6 +22,7 @@ func parseInput(input string) ([]int, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		numbers[index] = number
 	}
 
@@ -39,14 +40,16 @@ func part1(input []int) []int {
 	// Listen for outputs and when they are done send them on a channel
 	outputChan := computer.GetOutputChannel()
 	allOutputs := make(chan []int)
-	go func() {
+
+	listenForOutputs := func() {
 		var outputs []int
 		for i := range outputChan {
 			outputs = append(outputs, i)
 		}
 
 		allOutputs <- outputs
-	}()
+	}
+	go listenForOutputs()
 
 	computer.Run()
 
@@ -64,9 +67,11 @@ func part2(input []int) int {
 	// Listen for outputs and when they are done send them on a channel
 	outputChan := computer.GetOutputChannel()
 	output := make(chan int)
-	go func() {
+
+	forwardOutputs := func() {
 		output <- <-outputChan
-	}()
+	}
+	go forwardOutputs()
 
 	computer.Run()
 

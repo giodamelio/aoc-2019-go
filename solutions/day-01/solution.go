@@ -20,6 +20,7 @@ func parseInput(input string) ([]int, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		numbers[index] = number
 	}
 
@@ -32,7 +33,8 @@ func calculateMass(mass int) int {
 }
 
 func calculateMassWithFuel(mass int) int {
-	var totalMass int = 0
+	totalMass := 0
+
 	nextMass := mass
 
 	// Repeatedly calculate mass of fuel until it reaches zero or less
@@ -41,6 +43,7 @@ func calculateMassWithFuel(mass int) int {
 		if newMass <= 0 {
 			break
 		}
+
 		nextMass = newMass
 		totalMass += newMass
 	}
@@ -55,6 +58,7 @@ func part1(log *log.Logger, input []int) int {
 	for _, moduleMass := range input {
 		sum += calculateMass(moduleMass)
 	}
+
 	return sum
 }
 
@@ -65,5 +69,6 @@ func part2(log *log.Logger, input []int) int {
 	for _, moduleMass := range input {
 		sum += calculateMassWithFuel(moduleMass)
 	}
+
 	return sum
 }

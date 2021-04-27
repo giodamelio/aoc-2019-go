@@ -51,6 +51,7 @@ func reverseOutputModes(input []mode) []mode {
 func (ic Computer) parseOpcode(rawOpcode int) (int, []mode, error) {
 	// Get opcode from 1s and 10s columns
 	rawOpcodeString := fmt.Sprintf("%02d", rawOpcode)
+
 	opcode, err := strconv.Atoi(rawOpcodeString[len(rawOpcodeString)-2:])
 	if err != nil {
 		return 0, nil, err
@@ -60,6 +61,7 @@ func (ic Computer) parseOpcode(rawOpcode int) (int, []mode, error) {
 	opcodeDefinition, ok := ic.opcodes[opcode]
 	if !ok {
 		err := fmt.Errorf("invalid opcode: %d", opcode)
+
 		return 0, nil, err
 	}
 
@@ -67,7 +69,8 @@ func (ic Computer) parseOpcode(rawOpcode int) (int, []mode, error) {
 	parameterCount := len(opcodeDefinition.parameters)
 
 	// Format the rawOpcode to be as long as the opcode + parameters
-	rawOpcodeStringWithParameterModes := fmt.Sprintf("%0*d", 2+parameterCount, rawOpcode)
+	baseOpcodeLength := 2
+	rawOpcodeStringWithParameterModes := fmt.Sprintf("%0*d", baseOpcodeLength+parameterCount, rawOpcode)
 
 	// Get all the mode settings without the opcode itself
 	parameterModeSettings := rawOpcodeStringWithParameterModes[:len(rawOpcodeStringWithParameterModes)-2]
@@ -76,6 +79,7 @@ func (ic Computer) parseOpcode(rawOpcode int) (int, []mode, error) {
 	// 0 = Position
 	// 1 = Immediate
 	outputModes := make([]mode, len(parameterModeSettings))
+
 	for i, m := range parameterModeSettings {
 		intM, err := strconv.Atoi(string(m))
 		if err != nil {
@@ -91,10 +95,16 @@ func (ic Computer) parseOpcode(rawOpcode int) (int, []mode, error) {
 	return opcode, reversedOutputModes, nil
 }
 
-func (ic Computer) resolveParameters(memory *Memory, opcode int, opcodeParameters []int, parameterModes []mode) ([]int, error) {
+func (ic Computer) resolveParameters(
+	memory *Memory, opcode int,
+	opcodeParameters []int,
+	parameterModes []mode,
+) ([]int, error) {
 	resolvedParameters := make([]int, len(opcodeParameters))
+
 	for index, opcodeParameter := range opcodeParameters {
 		parameterMode := ic.opcodes[opcode].parameters[index]
+
 		switch parameterModes[index] {
 		case Position:
 			switch parameterMode {
@@ -104,17 +114,20 @@ func (ic Computer) resolveParameters(memory *Memory, opcode int, opcodeParameter
 				resolvedParameters[index] = memory.Get(opcodeParameter)
 			default:
 				err := fmt.Errorf("invalid parameter mode: %d", parameterModes[index])
+
 				return nil, err
 			}
 		case Immediate:
 			if parameterMode == Write {
 				err := fmt.Errorf("write parameter cannot be in immediate mode: %d", opcodeParameter)
+
 				return nil, err
 			}
 
 			resolvedParameters[index] = opcodeParameter
 		default:
 			err := fmt.Errorf("invalid mode: %d", parameterModes[index])
+
 			return nil, err
 		}
 	}
@@ -136,11 +149,10 @@ func (ic *Computer) Step() (int, error) {
 	if err != nil {
 		return -1, err
 	}
+
 	log.
 		Trace().
 		Int("opcode", opcode).
-		// TODO: figure out how to convert this
-		// Ints("parameterModes", parameterModes).
 		Msg("[COMPUTER] Parsed opcode")
 
 	// Get the parameters for the opcode
@@ -153,6 +165,7 @@ func (ic *Computer) Step() (int, error) {
 	if err != nil {
 		return -1, err
 	}
+
 	log.Trace().Ints("parameters", opcodeParameters).Msg("[COMPUTER] Resolved opcode parameters")
 
 	// Execute the opcode
@@ -171,9 +184,10 @@ func (ic Computer) Run() {
 		}
 
 		// Special case for HALT
-		if opcode == 99 {
+		if opcode == HALT {
 			close(ic.input)
 			close(ic.output)
+
 			break
 		}
 	}

@@ -11,10 +11,11 @@ func newMemory(initialMemory []int) *Memory {
 
 	mem := new(Memory)
 	mem.rawMemory = initialMemory
+
 	return mem
 }
 
-// Get the value of an address
+// Get the value of an address.
 func (im Memory) Get(address int) int {
 	value := im.rawMemory[address]
 
@@ -27,7 +28,7 @@ func (im Memory) Get(address int) int {
 	return value
 }
 
-// Get the values from a range of addresses
+// Get the values from a range of addresses.
 func (im Memory) GetRange(address int, length int) []int {
 	value := im.rawMemory[address : address+length]
 
@@ -40,7 +41,7 @@ func (im Memory) GetRange(address int, length int) []int {
 	return value
 }
 
-// Set the value of an address
+// Set the value of an address.
 func (im Memory) Set(address int, value int) {
 	log.
 		Trace().

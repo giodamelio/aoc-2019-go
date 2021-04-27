@@ -7,11 +7,11 @@ import (
 )
 
 func TestCopyMemory(t *testing.T) {
-	old := []int{1, 2, 3}
-	new := copyMemory(old)
+	oldSlice := []int{1, 2, 3}
+	newSlice := copyMemory(oldSlice)
 
-	new[0] = 4
+	newSlice[0] = 4
 
-	assert.Equal(t, []int{1, 2, 3}, old)
-	assert.Equal(t, []int{4, 2, 3}, new)
+	assert.Equal(t, []int{1, 2, 3}, oldSlice)
+	assert.Equal(t, []int{4, 2, 3}, newSlice)
 }

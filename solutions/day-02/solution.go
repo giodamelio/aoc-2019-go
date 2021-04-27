@@ -10,7 +10,7 @@ import (
 	"github.com/giodamelio/aoc-2020-go/intcode"
 )
 
-var discardLogger *log.Logger = log.New(ioutil.Discard, "", 0)
+var discardLogger = log.New(ioutil.Discard, "", 0)
 
 // Read the raw input
 //go:embed input.txt
@@ -25,6 +25,7 @@ func parseInput(input string) ([]int, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		numbers[index] = number
 	}
 

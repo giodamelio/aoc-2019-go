@@ -10,7 +10,11 @@ import (
 )
 
 func init() {
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, NoColor: true})
+	out := zerolog.NewConsoleWriter()
+	out.Out = os.Stderr
+	out.NoColor = true
+	log.Logger = log.Output(out)
+
 	zerolog.SetGlobalLevel(zerolog.TraceLevel)
 }
 
@@ -186,13 +190,15 @@ func TestSendInput(t *testing.T) {
 func TestGetOutputChannel(t *testing.T) {
 	computer := NewComputer([]int{104, 10, 99})
 
-	// Listen for the output
 	wait := make(chan bool)
-	go func() {
+
+	// Listen for the output
+	listenForOutput := func() {
 		output := <-computer.GetOutputChannel()
 		assert.Equal(t, 10, output)
 		wait <- true
-	}()
+	}
+	go listenForOutput()
 
 	computer.Run()
 
@@ -208,7 +214,7 @@ func TestGetOutputChannel(t *testing.T) {
 
 // Some test programs
 
-// Add two numbers
+// Add two numbers.
 func TestAddTwoNumber(t *testing.T) {
 	computer := NewComputer([]int{1101, 11, 22, 0, 99})
 
@@ -221,20 +227,22 @@ func TestAddTwoNumber(t *testing.T) {
 	)
 }
 
-// Take an input, double it and output it
+// Take an input, double it and output it.
 func TestDoubleInput(t *testing.T) {
 	computer := NewComputer([]int{3, 0, 2, 2, 0, 0, 4, 0, 99})
 
 	// Number to be doubled
 	computer.SendInput(11)
 
-	// Listen for the output
 	wait := make(chan bool)
-	go func() {
+
+	// Listen for the output
+	listenForOutput := func() {
 		output := <-computer.GetOutputChannel()
 		assert.Equal(t, 22, output)
 		wait <- true
-	}()
+	}
+	go listenForOutput()
 
 	computer.Run()
 
@@ -248,7 +256,7 @@ func TestDoubleInput(t *testing.T) {
 	<-wait
 }
 
-// Test if the input is greater then zero
+// Test if the input is greater then zero.
 func TestIsGreaterThenZero(t *testing.T) {
 	computer := NewComputer([]int{
 		// Program
@@ -268,13 +276,15 @@ func TestIsGreaterThenZero(t *testing.T) {
 
 	computer.SendInput(22)
 
-	// Listen for the output
 	wait := make(chan bool)
-	go func() {
+
+	// Listen for the output
+	listenForOutput := func() {
 		output := <-computer.GetOutputChannel()
 		assert.Equal(t, 1, output)
 		wait <- true
-	}()
+	}
+	go listenForOutput()
 
 	computer.Run()
 

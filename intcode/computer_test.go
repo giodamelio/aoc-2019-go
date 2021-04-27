@@ -243,7 +243,7 @@ func TestIsGreaterThenZero(t *testing.T) {
 	computer := NewComputer([]int{
 		// Program
 		3, 12, //           INPUT					Read input to address 12
-		6, 12, 15, //       JUMP-IF-FALSE	If the contents of address 12 are not zero
+		6, 12, 15, //       JUMP-IF-FALSE	If the contents of address 12 are zero
 		//                                jump to the location in address 15 (address 9)
 		1, 13, 14, 13, //   ADD						Add the values from addresses 13 and 14 and put them in address 13
 		4, 13, //           OUTPUT				Output the the value of address 13
@@ -256,13 +256,13 @@ func TestIsGreaterThenZero(t *testing.T) {
 		9,  //         15
 	})
 
-	computer.SendInput(11)
+	computer.SendInput(22)
 
 	// Listen for the output
 	wait := make(chan bool)
 	go func() {
 		output := <-computer.GetOutputChannel()
-		assert.Equal(t, 22, output)
+		assert.Equal(t, 1, output)
 		wait <- true
 	}()
 

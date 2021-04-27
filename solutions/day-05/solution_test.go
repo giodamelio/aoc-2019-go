@@ -50,5 +50,7 @@ func TestPart2(t *testing.T) {
 	parsedInput, err := parseInput(rawInput)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 0, part2(parsedInput))
+	output := part2(parsedInput)
+
+	assert.Equal(t, 12648139, output)
 }

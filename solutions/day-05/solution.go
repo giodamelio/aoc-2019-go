@@ -56,5 +56,19 @@ func part1(input []int) []int {
 func part2(input []int) int {
 	log.Println("Day 5 Part 2")
 
-	return 0
+	computer := intcode.NewComputer(input)
+
+	// Select Air Conditioning Unit
+	computer.SendInput(5)
+
+	// Listen for outputs and when they are done send them on a channel
+	outputChan := computer.GetOutputChannel()
+	output := make(chan int)
+	go func() {
+		output <- <-outputChan
+	}()
+
+	computer.Run()
+
+	return <-output
 }

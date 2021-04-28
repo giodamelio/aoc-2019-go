@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/giodamelio/aoc-2020-go/intcode"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
@@ -18,23 +19,8 @@ func init() {
 	zerolog.SetGlobalLevel(zerolog.TraceLevel)
 }
 
-func TestParseInput(t *testing.T) {
-	parsedInput, err := parseInput("1,2,3")
-
-	assert.Nil(t, err, "Parsing returned an error")
-	assert.Equal(t, []int{1, 2, 3}, parsedInput)
-}
-
-func TestParseInputNonInteger(t *testing.T) {
-	parsedInput, err := parseInput("1,haha,3")
-
-	assert.Error(t, err)
-	assert.Equal(t, err.Error(), "strconv.Atoi: parsing \"haha\": invalid syntax")
-	assert.Nil(t, parsedInput)
-}
-
 func TestPart1(t *testing.T) {
-	parsedInput, err := parseInput(rawInput)
+	parsedInput, err := intcode.ParseInput(rawInput)
 	assert.Nil(t, err)
 
 	output := part1(parsedInput)
@@ -51,7 +37,7 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart2(t *testing.T) {
-	parsedInput, err := parseInput(rawInput)
+	parsedInput, err := intcode.ParseInput(rawInput)
 	assert.Nil(t, err)
 
 	output := part2(parsedInput)

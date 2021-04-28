@@ -3,29 +3,11 @@ package main
 import (
 	_ "embed"
 	"log"
-	"strconv"
-	"strings"
 )
 
 // Read the raw input
 //go:embed input.txt
 var rawInput string
-
-func parseInput(input string) ([]int, error) {
-	lines := strings.Split(strings.TrimSpace(input), "\n")
-	numbers := make([]int, len(lines))
-
-	for index, line := range lines {
-		number, err := strconv.Atoi(line)
-		if err != nil {
-			return nil, err
-		}
-
-		numbers[index] = number
-	}
-
-	return numbers, nil
-}
 
 func calculateMass(mass int) int {
 	// `/` does floor division with integers

@@ -3,8 +3,6 @@ package main
 import (
 	_ "embed"
 	"log"
-	"strconv"
-	"strings"
 
 	"github.com/giodamelio/aoc-2020-go/intcode"
 )
@@ -12,22 +10,6 @@ import (
 // Read the raw input
 //go:embed input.txt
 var rawInput string
-
-func parseInput(input string) ([]int, error) {
-	bytes := strings.Split(strings.TrimSpace(input), ",")
-	numbers := make([]int, len(bytes))
-
-	for index, programByte := range bytes {
-		number, err := strconv.Atoi(programByte)
-		if err != nil {
-			return nil, err
-		}
-
-		numbers[index] = number
-	}
-
-	return numbers, nil
-}
 
 func part1(input []int) []int {
 	log.Println("Day 5 Part 1")

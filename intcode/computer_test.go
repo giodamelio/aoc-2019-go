@@ -178,23 +178,27 @@ func TestRunInvalidOpcode(t *testing.T) {
 	})
 }
 
-func TestSendInput(t *testing.T) {
+func TestInputChannel(t *testing.T) {
 	computer := NewComputer([]int{3, 3, 99, 0})
 
-	computer.SendInput(10)
+	sendInput := func() {
+		computer.Input <- 10
+	}
+	go sendInput()
+
 	computer.Run()
 
 	assert.Equal(t, []int{3, 3, 99, 10}, computer.Memory.rawMemory)
 }
 
-func TestGetOutputChannel(t *testing.T) {
+func TestOutputChannel(t *testing.T) {
 	computer := NewComputer([]int{104, 10, 99})
 
 	wait := make(chan bool)
 
 	// Listen for the output
 	listenForOutput := func() {
-		output := <-computer.GetOutputChannel()
+		output := <-computer.Output
 		assert.Equal(t, 10, output)
 		wait <- true
 	}
@@ -232,13 +236,16 @@ func TestDoubleInput(t *testing.T) {
 	computer := NewComputer([]int{3, 0, 2, 2, 0, 0, 4, 0, 99})
 
 	// Number to be doubled
-	computer.SendInput(11)
+	sendInput := func() {
+		computer.Input <- 11
+	}
+	go sendInput()
 
 	wait := make(chan bool)
 
 	// Listen for the output
 	listenForOutput := func() {
-		output := <-computer.GetOutputChannel()
+		output := <-computer.Output
 		assert.Equal(t, 22, output)
 		wait <- true
 	}
@@ -274,13 +281,16 @@ func TestIsGreaterThenZero(t *testing.T) {
 		9,  //         15
 	})
 
-	computer.SendInput(22)
+	sendInput := func() {
+		computer.Input <- 22
+	}
+	go sendInput()
 
 	wait := make(chan bool)
 
 	// Listen for the output
 	listenForOutput := func() {
-		output := <-computer.GetOutputChannel()
+		output := <-computer.Output
 		assert.Equal(t, 1, output)
 		wait <- true
 	}

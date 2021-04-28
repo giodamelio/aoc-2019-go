@@ -60,7 +60,7 @@ func TestInput(t *testing.T) {
 	computer := NewComputer([]int{3, 2, 0})
 
 	input := make(chan int)
-	computer.input = input
+	computer.Input = input
 
 	go func() {
 		input <- 10
@@ -76,7 +76,7 @@ func TestOutput(t *testing.T) {
 	computer := NewComputer([]int{4, 10, 10})
 
 	output := make(chan int, 1)
-	computer.output = output
+	computer.Output = output
 
 	opcodeOutput.execute(computer, opcodeOutput, computer.Memory.rawMemory[1:])
 

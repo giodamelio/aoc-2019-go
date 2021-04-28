@@ -17,10 +17,13 @@ func part1(input []int) []int {
 	computer := intcode.NewComputer(input)
 
 	// Select Air Conditioning Unit
-	computer.SendInput(1)
+	sendInput := func() {
+		computer.Input <- 1
+	}
+	go sendInput()
 
 	// Listen for outputs and when they are done send them on a channel
-	outputChan := computer.GetOutputChannel()
+	outputChan := computer.Output
 	allOutputs := make(chan []int)
 
 	listenForOutputs := func() {
@@ -44,10 +47,13 @@ func part2(input []int) int {
 	computer := intcode.NewComputer(input)
 
 	// Select Air Conditioning Unit
-	computer.SendInput(5)
+	sendInput := func() {
+		computer.Input <- 5
+	}
+	go sendInput()
 
 	// Listen for outputs and when they are done send them on a channel
-	outputChan := computer.GetOutputChannel()
+	outputChan := computer.Output
 	output := make(chan int)
 
 	forwardOutputs := func() {

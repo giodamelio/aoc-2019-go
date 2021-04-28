@@ -93,7 +93,7 @@ var Opcodes = map[int]Opcode{
 		parameters: []readWrite{Write},
 		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			address := parameters[0]
-			value := <-computer.input
+			value := <-computer.Input
 
 			computer.Memory.Set(address, value)
 
@@ -113,7 +113,7 @@ var Opcodes = map[int]Opcode{
 		execute: func(computer *Computer, operation Opcode, parameters []int) {
 			value := parameters[0]
 
-			computer.output <- value
+			computer.Output <- value
 
 			log.
 				Debug().

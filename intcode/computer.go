@@ -12,8 +12,8 @@ type Computer struct {
 	instructionPointer int
 	opcodes            map[int]Opcode
 	errorHandler       func(error)
-	input              chan int
-	output             chan int
+	Input              chan int
+	Output             chan int
 }
 
 func NewComputer(initialMemory []int) *Computer {
@@ -25,8 +25,8 @@ func NewComputer(initialMemory []int) *Computer {
 	comp.Memory = newMemory(copyOfInitialMemory)
 	comp.instructionPointer = 0
 	comp.opcodes = Opcodes
-	comp.input = make(chan int)
-	comp.output = make(chan int)
+	comp.Input = make(chan int)
+	comp.Output = make(chan int)
 
 	// Default to panicing when things go wrong
 	comp.errorHandler = func(err error) {
@@ -185,20 +185,10 @@ func (ic Computer) Run() {
 
 		// Special case for HALT
 		if opcode == HALT {
-			close(ic.input)
-			close(ic.output)
+			close(ic.Input)
+			close(ic.Output)
 
 			break
 		}
 	}
-}
-
-func (ic *Computer) SendInput(input int) {
-	go func() {
-		ic.input <- input
-	}()
-}
-
-func (ic *Computer) GetOutputChannel() chan int {
-	return ic.output
 }

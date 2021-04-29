@@ -17,7 +17,7 @@ func init() {
 	out.NoColor = true
 	log.Logger = log.Output(out)
 
-	zerolog.SetGlobalLevel(zerolog.TraceLevel)
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 }
 
 func TestChainingComputers(t *testing.T) {
@@ -36,7 +36,7 @@ func TestChainingComputers(t *testing.T) {
 	computer2 := intcode.NewComputer(program)
 
 	go send(computer1.Input, 10)
-	go pipe(computer1.Output, computer2.Input)
+	go pipe(computer1.Output, []chan int{computer2.Input})
 
 	go computer1.Run()
 	go computer2.Run()
@@ -59,11 +59,13 @@ func TestPermutations(t *testing.T) {
 func TestPipe(t *testing.T) {
 	input := make(chan int)
 	output := make(chan int)
+	output2 := make(chan int)
 
 	go send(input, 10)
-	go pipe(input, output)
+	go pipe(input, []chan int{output, output2})
 
 	assert.Equal(t, 10, <-output)
+	assert.Equal(t, 10, <-output2)
 }
 
 func TestSend(t *testing.T) {
@@ -94,6 +96,23 @@ func TestAmplifyChain(t *testing.T) {
 	assert.Equal(t, 65210, output3)
 }
 
+func TestAmplifyChainFeedbackMode(t *testing.T) {
+	exampleProgram1 := []int{
+		3, 26, 1001, 26, -4, 26, 3, 27, 1002, 27, 2, 27, 1, 27, 26,
+		27, 4, 27, 1001, 28, -1, 28, 1005, 28, 6, 99, 0, 0, 5,
+	}
+	output1 := amplifierChainFeedbackMode(exampleProgram1, []int{9, 8, 7, 6, 5})
+	assert.Equal(t, 139629729, output1)
+
+	exampleProgram2 := []int{
+		3, 52, 1001, 52, -5, 52, 3, 53, 1, 52, 56, 54, 1007, 54, 5, 55, 1005, 55, 26, 1001, 54,
+		-5, 54, 1105, 1, 12, 1, 53, 54, 53, 1008, 54, 0, 55, 1001, 55, 1, 55, 2, 53, 55, 53, 4,
+		53, 1001, 56, -1, 56, 1005, 56, 6, 99, 0, 0, 0, 0, 10,
+	}
+	output2 := amplifierChainFeedbackMode(exampleProgram2, []int{9, 7, 8, 5, 6})
+	assert.Equal(t, 18216, output2)
+}
+
 func TestPart1(t *testing.T) {
 	parsedInput, err := intcode.ParseInput(rawInput)
 	assert.Nil(t, err)
@@ -109,5 +128,5 @@ func TestPart2(t *testing.T) {
 
 	output := part2(parsedInput)
 
-	assert.Equal(t, 0, output)
+	assert.Equal(t, 4374895, output)
 }

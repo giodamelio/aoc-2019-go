@@ -14,6 +14,8 @@ type Computer struct {
 	errorHandler       func(error)
 	Input              chan int
 	Output             chan int
+	State              string
+	Name               string
 }
 
 func NewComputer(initialMemory []int) *Computer {
@@ -27,6 +29,8 @@ func NewComputer(initialMemory []int) *Computer {
 	comp.opcodes = Opcodes
 	comp.Input = make(chan int)
 	comp.Output = make(chan int)
+	comp.State = "pre-run"
+	comp.Name = "computer"
 
 	// Default to panicing when things go wrong
 	comp.errorHandler = func(err error) {
@@ -176,7 +180,9 @@ func (ic *Computer) Step() (int, error) {
 	return opcode, nil
 }
 
-func (ic Computer) Run() {
+func (ic *Computer) Run() {
+	ic.State = "running"
+
 	for {
 		opcode, err := ic.Step()
 		if err != nil {
@@ -185,6 +191,10 @@ func (ic Computer) Run() {
 
 		// Special case for HALT
 		if opcode == HALT {
+			ic.State = "halted"
+
+			log.Info().Str("name", ic.Name).Msg("[COMPUTER] Halt")
+
 			close(ic.Input)
 			close(ic.Output)
 

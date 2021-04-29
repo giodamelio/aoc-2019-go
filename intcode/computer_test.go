@@ -23,6 +23,8 @@ func TestNewComputer(t *testing.T) {
 
 	assert.Equal(t, 0, computer.instructionPointer)
 	assert.Equal(t, []int{1, 2, 3}, computer.Memory.rawMemory)
+	assert.Equal(t, "computer", computer.Name)
+	assert.Equal(t, "pre-run", computer.State)
 }
 
 func TestNewComputerNotModifyInitialMemory(t *testing.T) {
@@ -33,6 +35,7 @@ func TestNewComputerNotModifyInitialMemory(t *testing.T) {
 
 	assert.Equal(t, []int{3, 1, 2, 0, 99}, computer.Memory.rawMemory)
 	assert.Equal(t, []int{1101, 1, 2, 0, 99}, program)
+	assert.Equal(t, "halted", computer.State)
 }
 
 func TestReverOutputModes(t *testing.T) {

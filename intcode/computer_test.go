@@ -19,22 +19,22 @@ func init() {
 }
 
 func TestNewComputer(t *testing.T) {
-	computer := NewComputer([]int{1, 2, 3})
+	computer := NewComputer([]AddressValue{1, 2, 3})
 
-	assert.Equal(t, 0, computer.instructionPointer)
-	assert.Equal(t, []int{1, 2, 3}, computer.Memory.rawMemory)
+	assert.Equal(t, AddressLocation(0), computer.instructionPointer)
+	assert.Equal(t, []AddressValue{1, 2, 3}, computer.Memory.rawMemory)
 	assert.Equal(t, "computer", computer.Name)
 	assert.Equal(t, "pre-run", computer.State)
 }
 
 func TestNewComputerNotModifyInitialMemory(t *testing.T) {
-	program := []int{1101, 1, 2, 0, 99}
+	program := []AddressValue{1101, 1, 2, 0, 99}
 	computer := NewComputer(program)
 
 	computer.Run()
 
-	assert.Equal(t, []int{3, 1, 2, 0, 99}, computer.Memory.rawMemory)
-	assert.Equal(t, []int{1101, 1, 2, 0, 99}, program)
+	assert.Equal(t, []AddressValue{3, 1, 2, 0, 99}, computer.Memory.rawMemory)
+	assert.Equal(t, []AddressValue{1101, 1, 2, 0, 99}, program)
 	assert.Equal(t, "halted", computer.State)
 }
 
@@ -44,9 +44,9 @@ func TestReverOutputModes(t *testing.T) {
 }
 
 func TestParseOpcode(t *testing.T) {
-	computer := NewComputer([]int{})
+	computer := NewComputer([]AddressValue{})
 
-	opcodes := []int{2, 1002, 4, 99}
+	opcodes := []AddressValue{2, 1002, 4, 99}
 	for _, opcode := range opcodes {
 		opcode, parameterModes, err := computer.parseOpcode(opcode)
 
@@ -56,7 +56,7 @@ func TestParseOpcode(t *testing.T) {
 }
 
 func TestParseOpcodeProperlyReversed(t *testing.T) {
-	computer := NewComputer([]int{})
+	computer := NewComputer([]AddressValue{})
 
 	_, parameterModes, err := computer.parseOpcode(1101)
 	assert.Nil(t, err)
@@ -64,32 +64,32 @@ func TestParseOpcodeProperlyReversed(t *testing.T) {
 }
 
 func TestParseOpcodeInvalid(t *testing.T) {
-	computer := NewComputer([]int{})
+	computer := NewComputer([]AddressValue{})
 
 	_, _, err := computer.parseOpcode(1050)
 	assert.Equal(t, "invalid opcode: 50", err.Error())
 }
 
 func TestResolveParameters(t *testing.T) {
-	computer := NewComputer([]int{11002, 11, 11, 0})
+	computer := NewComputer([]AddressValue{11002, 11, 11, 0})
 	opcodeParameters, err := computer.resolveParameters(
 		computer.Memory,
 		2,
-		[]int{11, 11, 0},
+		[]AddressValue{11, 11, 0},
 		[]mode{Immediate, Immediate, Position},
 	)
 
 	assert.Nil(t, err)
-	assert.Equal(t, []int{11, 11, 0}, opcodeParameters)
+	assert.Equal(t, []AddressValue{11, 11, 0}, opcodeParameters)
 }
 
 func TestResolveParametersErrors(t *testing.T) {
-	computer := NewComputer([]int{11102, 11, 11, 0})
+	computer := NewComputer([]AddressValue{11102, 11, 11, 0})
 
 	opcodeParameters, err := computer.resolveParameters(
 		computer.Memory,
 		2,
-		[]int{11, 11, 0},
+		[]AddressValue{11, 11, 0},
 		[]mode{Immediate, Immediate, Immediate},
 	)
 
@@ -99,7 +99,7 @@ func TestResolveParametersErrors(t *testing.T) {
 	opcodeParameters, err = computer.resolveParameters(
 		computer.Memory,
 		2,
-		[]int{11, 11, 0},
+		[]AddressValue{11, 11, 0},
 		[]mode{Immediate, Immediate, 2},
 	)
 
@@ -111,12 +111,12 @@ func TestResolveParametersErrors(t *testing.T) {
 		name:       "FAKE",
 		opcode:     98,
 		parameters: []readWrite{Read, Read, 2},
-		execute:    func(computer *Computer, operation Opcode, parameters []int) {},
+		execute:    func(computer *Computer, operation Opcode, parameters []AddressValue) {},
 	}
 	opcodeParameters, err = computer.resolveParameters(
 		computer.Memory,
 		98,
-		[]int{11, 11, 0},
+		[]AddressValue{11, 11, 0},
 		[]mode{Immediate, Immediate, Position},
 	)
 
@@ -125,56 +125,56 @@ func TestResolveParametersErrors(t *testing.T) {
 }
 
 func TestSetInstructionPointer(t *testing.T) {
-	computer := NewComputer([]int{1, 0, 0, 0})
+	computer := NewComputer([]AddressValue{1, 0, 0, 0})
 
-	assert.Equal(t, 0, computer.instructionPointer)
+	assert.Equal(t, AddressLocation(0), computer.instructionPointer)
 
 	computer.SetInstructionPointer(3)
 
-	assert.Equal(t, 3, computer.instructionPointer)
+	assert.Equal(t, AddressLocation(3), computer.instructionPointer)
 }
 
 func TestStep(t *testing.T) {
-	computer := NewComputer([]int{1, 0, 0, 0})
+	computer := NewComputer([]AddressValue{1, 0, 0, 0})
 
 	opcode, err := computer.Step()
 
 	assert.Nil(t, err)
-	assert.Equal(t, 1, opcode)
-	assert.Equal(t, []int{2, 0, 0, 0}, computer.Memory.rawMemory)
+	assert.Equal(t, AddressValue(1), opcode)
+	assert.Equal(t, []AddressValue{2, 0, 0, 0}, computer.Memory.rawMemory)
 }
 
 func TestStepInvalidOpcode(t *testing.T) {
-	computer := NewComputer([]int{-1, 0, 0, 0})
+	computer := NewComputer([]AddressValue{-1, 0, 0, 0})
 
 	opcode, err := computer.Step()
 
-	assert.Equal(t, -1, opcode)
+	assert.Equal(t, AddressValue(-1), opcode)
 	assert.Equal(t, "invalid opcode: -1", err.Error())
-	assert.Equal(t, []int{-1, 0, 0, 0}, computer.Memory.rawMemory)
+	assert.Equal(t, []AddressValue{-1, 0, 0, 0}, computer.Memory.rawMemory)
 }
 
 func TestStepNoIncrementInstructionPointer(t *testing.T) {
-	computer := NewComputer([]int{99})
+	computer := NewComputer([]AddressValue{99})
 
 	opcode, err := computer.Step()
 
 	assert.Nil(t, err)
-	assert.Equal(t, 99, opcode)
-	assert.Equal(t, []int{99}, computer.Memory.rawMemory)
-	assert.Equal(t, 0, computer.instructionPointer)
+	assert.Equal(t, AddressValue(99), opcode)
+	assert.Equal(t, []AddressValue{99}, computer.Memory.rawMemory)
+	assert.Equal(t, AddressLocation(0), computer.instructionPointer)
 }
 
 func TestRun(t *testing.T) {
-	computer := NewComputer([]int{1, 9, 10, 3, 2, 3, 11, 0, 99, 30, 40, 50})
+	computer := NewComputer([]AddressValue{1, 9, 10, 3, 2, 3, 11, 0, 99, 30, 40, 50})
 
 	computer.Run()
 
-	assert.Equal(t, 3500, computer.Memory.rawMemory[0])
+	assert.Equal(t, AddressValue(3500), computer.Memory.rawMemory[0])
 }
 
 func TestRunInvalidOpcode(t *testing.T) {
-	computer := NewComputer([]int{-1})
+	computer := NewComputer([]AddressValue{-1})
 
 	assert.PanicsWithError(t, "invalid opcode: -1", func() {
 		computer.Run()
@@ -182,7 +182,7 @@ func TestRunInvalidOpcode(t *testing.T) {
 }
 
 func TestInputChannel(t *testing.T) {
-	computer := NewComputer([]int{3, 3, 99, 0})
+	computer := NewComputer([]AddressValue{3, 3, 99, 0})
 
 	sendInput := func() {
 		computer.Input <- 10
@@ -191,18 +191,18 @@ func TestInputChannel(t *testing.T) {
 
 	computer.Run()
 
-	assert.Equal(t, []int{3, 3, 99, 10}, computer.Memory.rawMemory)
+	assert.Equal(t, []AddressValue{3, 3, 99, 10}, computer.Memory.rawMemory)
 }
 
 func TestOutputChannel(t *testing.T) {
-	computer := NewComputer([]int{104, 10, 99})
+	computer := NewComputer([]AddressValue{104, 10, 99})
 
 	wait := make(chan bool)
 
 	// Listen for the output
 	listenForOutput := func() {
 		output := <-computer.Output
-		assert.Equal(t, 10, output)
+		assert.Equal(t, AddressValue(10), output)
 		wait <- true
 	}
 	go listenForOutput()
@@ -211,7 +211,7 @@ func TestOutputChannel(t *testing.T) {
 
 	assert.Equal(
 		t,
-		[]int{104, 10, 99},
+		[]AddressValue{104, 10, 99},
 		computer.Memory.rawMemory,
 	)
 
@@ -223,20 +223,20 @@ func TestOutputChannel(t *testing.T) {
 
 // Add two numbers.
 func TestAddTwoNumber(t *testing.T) {
-	computer := NewComputer([]int{1101, 11, 22, 0, 99})
+	computer := NewComputer([]AddressValue{1101, 11, 22, 0, 99})
 
 	computer.Run()
 
 	assert.Equal(
 		t,
-		[]int{33, 11, 22, 0, 99},
+		[]AddressValue{33, 11, 22, 0, 99},
 		computer.Memory.rawMemory,
 	)
 }
 
 // Take an input, double it and output it.
 func TestDoubleInput(t *testing.T) {
-	computer := NewComputer([]int{3, 0, 2, 2, 0, 0, 4, 0, 99})
+	computer := NewComputer([]AddressValue{3, 0, 2, 2, 0, 0, 4, 0, 99})
 
 	// Number to be doubled
 	sendInput := func() {
@@ -249,7 +249,7 @@ func TestDoubleInput(t *testing.T) {
 	// Listen for the output
 	listenForOutput := func() {
 		output := <-computer.Output
-		assert.Equal(t, 22, output)
+		assert.Equal(t, AddressValue(22), output)
 		wait <- true
 	}
 	go listenForOutput()
@@ -258,7 +258,7 @@ func TestDoubleInput(t *testing.T) {
 
 	assert.Equal(
 		t,
-		[]int{22, 0, 2, 2, 0, 0, 4, 0, 99},
+		[]AddressValue{22, 0, 2, 2, 0, 0, 4, 0, 99},
 		computer.Memory.rawMemory,
 	)
 
@@ -268,7 +268,7 @@ func TestDoubleInput(t *testing.T) {
 
 // Test if the input is greater then zero.
 func TestIsGreaterThenZero(t *testing.T) {
-	computer := NewComputer([]int{
+	computer := NewComputer([]AddressValue{
 		// Program
 		3, 12, //           INPUT					Read input to address 12
 		6, 12, 15, //       JUMP-IF-FALSE	If the contents of address 12 are zero
@@ -294,7 +294,7 @@ func TestIsGreaterThenZero(t *testing.T) {
 	// Listen for the output
 	listenForOutput := func() {
 		output := <-computer.Output
-		assert.Equal(t, 1, output)
+		assert.Equal(t, AddressValue(1), output)
 		wait <- true
 	}
 	go listenForOutput()

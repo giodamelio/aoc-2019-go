@@ -9,16 +9,16 @@ import (
 
 type Computer struct {
 	Memory             *Memory
-	instructionPointer int
-	opcodes            map[int]Opcode
+	instructionPointer AddressLocation
+	opcodes            map[AddressValue]Opcode
 	errorHandler       func(error)
-	Input              chan int
-	Output             chan int
+	Input              chan AddressValue
+	Output             chan AddressValue
 	State              string
 	Name               string
 }
 
-func NewComputer(initialMemory []int) *Computer {
+func NewComputer(initialMemory []AddressValue) *Computer {
 	log.Debug().Msg("[COMPUTER] Computer created")
 
 	copyOfInitialMemory := copyMemory(initialMemory)
@@ -27,8 +27,8 @@ func NewComputer(initialMemory []int) *Computer {
 	comp.Memory = newMemory(copyOfInitialMemory)
 	comp.instructionPointer = 0
 	comp.opcodes = Opcodes
-	comp.Input = make(chan int)
-	comp.Output = make(chan int)
+	comp.Input = make(chan AddressValue)
+	comp.Output = make(chan AddressValue)
 	comp.State = "pre-run"
 	comp.Name = "computer"
 
@@ -52,7 +52,7 @@ func reverseOutputModes(input []mode) []mode {
 	return output
 }
 
-func (ic Computer) parseOpcode(rawOpcode int) (int, []mode, error) {
+func (ic Computer) parseOpcode(rawOpcode AddressValue) (AddressValue, []mode, error) {
 	// Get opcode from 1s and 10s columns
 	rawOpcodeString := fmt.Sprintf("%02d", rawOpcode)
 
@@ -62,7 +62,7 @@ func (ic Computer) parseOpcode(rawOpcode int) (int, []mode, error) {
 	}
 
 	// Check if it is a valid opcode
-	opcodeDefinition, ok := ic.opcodes[opcode]
+	opcodeDefinition, ok := ic.opcodes[AddressValue(opcode)]
 	if !ok {
 		err := fmt.Errorf("invalid opcode: %d", opcode)
 
@@ -96,15 +96,15 @@ func (ic Computer) parseOpcode(rawOpcode int) (int, []mode, error) {
 	// Reverse the output modes since they are read right to left
 	reversedOutputModes := reverseOutputModes(outputModes)
 
-	return opcode, reversedOutputModes, nil
+	return AddressValue(opcode), reversedOutputModes, nil
 }
 
 func (ic Computer) resolveParameters(
-	memory *Memory, opcode int,
-	opcodeParameters []int,
+	memory *Memory, opcode AddressValue,
+	opcodeParameters []AddressValue,
 	parameterModes []mode,
-) ([]int, error) {
-	resolvedParameters := make([]int, len(opcodeParameters))
+) ([]AddressValue, error) {
+	resolvedParameters := make([]AddressValue, len(opcodeParameters))
 
 	for index, opcodeParameter := range opcodeParameters {
 		parameterMode := ic.opcodes[opcode].parameters[index]
@@ -115,7 +115,7 @@ func (ic Computer) resolveParameters(
 			case Write:
 				resolvedParameters[index] = opcodeParameter
 			case Read:
-				resolvedParameters[index] = memory.Get(opcodeParameter)
+				resolvedParameters[index] = memory.Get(AddressLocation(opcodeParameter))
 			default:
 				err := fmt.Errorf("invalid parameter mode: %d", parameterModes[index])
 
@@ -139,14 +139,14 @@ func (ic Computer) resolveParameters(
 	return resolvedParameters, nil
 }
 
-func (ic *Computer) SetInstructionPointer(address int) {
+func (ic *Computer) SetInstructionPointer(address AddressLocation) {
 	ic.instructionPointer = address
 }
 
-func (ic *Computer) Step() (int, error) {
+func (ic *Computer) Step() (AddressValue, error) {
 	// Get the opcode at the address of the instruction pointer
 	opcode := ic.Memory.Get(ic.instructionPointer)
-	log.Trace().Int("opcode", opcode).Msg("[COMPUTER] Retrieved opcode")
+	log.Trace().Int64("opcode", int64(opcode)).Msg("[COMPUTER] Retrieved opcode")
 
 	// Parse the opcode
 	opcode, parameterModes, err := ic.parseOpcode(opcode)
@@ -156,13 +156,14 @@ func (ic *Computer) Step() (int, error) {
 
 	log.
 		Trace().
-		Int("opcode", opcode).
+		Int64("opcode", int64(opcode)).
 		Msg("[COMPUTER] Parsed opcode")
 
 	// Get the parameters for the opcode
 	parametersLength := len(ic.opcodes[opcode].parameters)
-	opcodeParameters := ic.Memory.GetRange(ic.instructionPointer+1, parametersLength)
-	log.Trace().Ints("parameters", opcodeParameters).Msg("[COMPUTER] Retrieved opcode parameters")
+	opcodeParameters := ic.Memory.GetRange(ic.instructionPointer+1, int64(parametersLength))
+	// TODO: fix this log
+	// log.Trace().Ints("parameters", opcodeParameters).Msg("[COMPUTER] Retrieved opcode parameters")
 
 	// Resolve the parameters based on the modes
 	opcodeParameters, err = ic.resolveParameters(ic.Memory, opcode, opcodeParameters, parameterModes)
@@ -170,7 +171,8 @@ func (ic *Computer) Step() (int, error) {
 		return -1, err
 	}
 
-	log.Trace().Ints("parameters", opcodeParameters).Msg("[COMPUTER] Resolved opcode parameters")
+	// TODO: fix this log
+	// log.Trace().Ints("parameters", opcodeParameters).Msg("[COMPUTER] Resolved opcode parameters")
 
 	// Execute the opcode
 	operation := ic.opcodes[opcode]

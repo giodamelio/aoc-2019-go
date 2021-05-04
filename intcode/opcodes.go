@@ -32,9 +32,9 @@ const (
 
 type Opcode struct {
 	name       string
-	opcode     int
+	opcode     AddressValue
 	parameters []readWrite
-	execute    func(*Computer, Opcode, []int)
+	execute    func(*Computer, Opcode, []AddressValue)
 }
 
 // The total length of the opcode including parameters.
@@ -43,15 +43,15 @@ func (o Opcode) length() int {
 }
 
 func (o Opcode) incrementInstructionPointer(computer *Computer) {
-	computer.SetInstructionPointer(computer.instructionPointer + o.length())
+	computer.SetInstructionPointer(computer.instructionPointer + AddressLocation(o.length()))
 }
 
-var Opcodes = map[int]Opcode{
+var Opcodes = map[AddressValue]Opcode{
 	ADD: {
 		name:       "ADD",
 		opcode:     ADD,
 		parameters: []readWrite{Read, Read, Write},
-		execute: func(computer *Computer, operation Opcode, parameters []int) {
+		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			leftHandSide := parameters[0]
 			rightHandSide := parameters[1]
 			result := leftHandSide + rightHandSide
@@ -59,9 +59,9 @@ var Opcodes = map[int]Opcode{
 
 			log.
 				Debug().
-				Int("leftHandSide", leftHandSide).
-				Int("rightHandSide", rightHandSide).
-				Int("result", result).
+				Int64("leftHandSide", int64(leftHandSide)).
+				Int64("rightHandSide", int64(rightHandSide)).
+				Int64("result", int64(result)).
 				Msg("[OPCODE] ADD")
 
 			operation.incrementInstructionPointer(computer)
@@ -71,7 +71,7 @@ var Opcodes = map[int]Opcode{
 		name:       "MULTIPLY",
 		opcode:     MULTIPLY,
 		parameters: []readWrite{Read, Read, Write},
-		execute: func(computer *Computer, operation Opcode, parameters []int) {
+		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			leftHandSide := parameters[0]
 			rightHandSide := parameters[1]
 			result := leftHandSide * rightHandSide
@@ -79,9 +79,9 @@ var Opcodes = map[int]Opcode{
 
 			log.
 				Debug().
-				Int("leftHandSide", leftHandSide).
-				Int("rightHandSide", rightHandSide).
-				Int("result", result).
+				Int64("leftHandSide", int64(leftHandSide)).
+				Int64("rightHandSide", int64(rightHandSide)).
+				Int64("result", int64(result)).
 				Msg("[OPCODE] MULTIPLY")
 
 			operation.incrementInstructionPointer(computer)
@@ -91,7 +91,7 @@ var Opcodes = map[int]Opcode{
 		name:       "INPUT",
 		opcode:     INPUT,
 		parameters: []readWrite{Write},
-		execute: func(computer *Computer, operation Opcode, parameters []int) {
+		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			address := parameters[0]
 			value := <-computer.Input
 
@@ -99,8 +99,8 @@ var Opcodes = map[int]Opcode{
 
 			log.
 				Debug().
-				Int("input", value).
-				Int("address", address).
+				Int64("input", int64(value)).
+				Int64("address", int64(address)).
 				Msg("[OPCODE] INPUT")
 
 			operation.incrementInstructionPointer(computer)
@@ -110,14 +110,14 @@ var Opcodes = map[int]Opcode{
 		name:       "OUTPUT",
 		opcode:     OUTPUT,
 		parameters: []readWrite{Read},
-		execute: func(computer *Computer, operation Opcode, parameters []int) {
+		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			value := parameters[0]
 
 			computer.Output <- value
 
 			log.
 				Debug().
-				Int("output", value).
+				Int64("output", int64(value)).
 				Msg("[OPCODE] OUTPUT")
 
 			operation.incrementInstructionPointer(computer)
@@ -127,18 +127,18 @@ var Opcodes = map[int]Opcode{
 		name:       "JUMP-IF-TRUE",
 		opcode:     JUMPIFTRUE,
 		parameters: []readWrite{Read, Read},
-		execute: func(computer *Computer, operation Opcode, parameters []int) {
+		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			condition := parameters[0]
 			address := parameters[1]
 
 			log.
 				Debug().
-				Int("condition", condition).
-				Int("address", address).
+				Int64("condition", int64(condition)).
+				Int64("address", int64(address)).
 				Msg("[OPCODE] JUMP-IF-TRUE")
 
 			if condition != 0 {
-				computer.SetInstructionPointer(address)
+				computer.SetInstructionPointer(AddressLocation(address))
 			} else {
 				operation.incrementInstructionPointer(computer)
 			}
@@ -148,18 +148,18 @@ var Opcodes = map[int]Opcode{
 		name:       "JUMP-IF-FALSE",
 		opcode:     JUMPIFFALSE,
 		parameters: []readWrite{Read, Read},
-		execute: func(computer *Computer, operation Opcode, parameters []int) {
+		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			condition := parameters[0]
 			address := parameters[1]
 
 			log.
 				Debug().
-				Int("condition", condition).
-				Int("address", address).
+				Int64("condition", int64(condition)).
+				Int64("address", int64(address)).
 				Msg("[OPCODE] JUMP-IF-FALSE")
 
 			if condition == 0 {
-				computer.SetInstructionPointer(address)
+				computer.SetInstructionPointer(AddressLocation(address))
 			} else {
 				operation.incrementInstructionPointer(computer)
 			}
@@ -169,12 +169,12 @@ var Opcodes = map[int]Opcode{
 		name:       "LESS-THAN",
 		opcode:     LESSTHAN,
 		parameters: []readWrite{Read, Read, Write},
-		execute: func(computer *Computer, operation Opcode, parameters []int) {
+		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			lhs := parameters[0]
 			rhs := parameters[1]
 			outputAddress := parameters[2]
 
-			var output int
+			var output AddressValue
 			if lhs < rhs {
 				output = 1
 			} else {
@@ -183,10 +183,10 @@ var Opcodes = map[int]Opcode{
 
 			log.
 				Debug().
-				Int("lhs", lhs).
-				Int("rhs", rhs).
-				Int("outputAddress", outputAddress).
-				Int("output", output).
+				Int64("lhs", int64(lhs)).
+				Int64("rhs", int64(rhs)).
+				Int64("outputAddress", int64(outputAddress)).
+				Int64("output", int64(output)).
 				Msg("[OPCODE] LESS-THAN")
 
 			computer.Memory.Set(outputAddress, output)
@@ -198,12 +198,12 @@ var Opcodes = map[int]Opcode{
 		name:       "EQUALS",
 		opcode:     EQUALS,
 		parameters: []readWrite{Read, Read, Write},
-		execute: func(computer *Computer, operation Opcode, parameters []int) {
+		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			lhs := parameters[0]
 			rhs := parameters[1]
 			outputAddress := parameters[2]
 
-			var output int
+			var output AddressValue
 			if lhs == rhs {
 				output = 1
 			} else {
@@ -212,10 +212,10 @@ var Opcodes = map[int]Opcode{
 
 			log.
 				Debug().
-				Int("lhs", lhs).
-				Int("rhs", rhs).
-				Int("outputAddress", outputAddress).
-				Int("output", output).
+				Int64("lhs", int64(lhs)).
+				Int64("rhs", int64(rhs)).
+				Int64("outputAddress", int64(outputAddress)).
+				Int64("output", int64(output)).
 				Msg("[OPCODE] EQUALS")
 
 			computer.Memory.Set(outputAddress, output)
@@ -227,7 +227,7 @@ var Opcodes = map[int]Opcode{
 		name:       "HALT",
 		opcode:     HALT,
 		parameters: []readWrite{},
-		execute: func(computer *Computer, operation Opcode, parameters []int) {
+		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			log.
 				Debug().
 				Msg("[OPCODE] HALT")

@@ -41,9 +41,9 @@ func NewComputer(initialMemory []AddressValue) *Computer {
 	return comp
 }
 
-func reverseOutputModes(input []mode) []mode {
+func reverseOutputModes(input []Mode) []Mode {
 	inputLength := len(input)
-	output := make([]mode, inputLength)
+	output := make([]Mode, inputLength)
 
 	for i, item := range input {
 		output[inputLength-i-1] = item
@@ -52,7 +52,7 @@ func reverseOutputModes(input []mode) []mode {
 	return output
 }
 
-func (ic Computer) parseOpcode(rawOpcode AddressValue) (AddressValue, []mode, error) {
+func (ic Computer) parseOpcode(rawOpcode AddressValue) (AddressValue, []Mode, error) {
 	// Get opcode from 1s and 10s columns
 	rawOpcodeString := fmt.Sprintf("%02d", rawOpcode)
 
@@ -82,7 +82,7 @@ func (ic Computer) parseOpcode(rawOpcode AddressValue) (AddressValue, []mode, er
 	// Convert the mode numbers to their mode enum
 	// 0 = Position
 	// 1 = Immediate
-	outputModes := make([]mode, len(parameterModeSettings))
+	outputModes := make([]Mode, len(parameterModeSettings))
 
 	for i, m := range parameterModeSettings {
 		intM, err := strconv.Atoi(string(m))
@@ -90,7 +90,7 @@ func (ic Computer) parseOpcode(rawOpcode AddressValue) (AddressValue, []mode, er
 			return 0, nil, err
 		}
 
-		outputModes[i] = mode(intM)
+		outputModes[i] = Mode(intM)
 	}
 
 	// Reverse the output modes since they are read right to left
@@ -102,7 +102,7 @@ func (ic Computer) parseOpcode(rawOpcode AddressValue) (AddressValue, []mode, er
 func (ic Computer) resolveParameters(
 	memory *Memory, opcode AddressValue,
 	opcodeParameters []AddressValue,
-	parameterModes []mode,
+	parameterModes []Mode,
 ) ([]AddressValue, error) {
 	resolvedParameters := make([]AddressValue, len(opcodeParameters))
 

@@ -39,8 +39,8 @@ func TestNewComputerNotModifyInitialMemory(t *testing.T) {
 }
 
 func TestReverOutputModes(t *testing.T) {
-	out := reverseOutputModes([]mode{Immediate, Immediate, Position})
-	assert.Equal(t, []mode{Position, Immediate, Immediate}, out)
+	out := reverseOutputModes([]Mode{Immediate, Immediate, Position})
+	assert.Equal(t, []Mode{Position, Immediate, Immediate}, out)
 }
 
 func TestParseOpcode(t *testing.T) {
@@ -60,7 +60,7 @@ func TestParseOpcodeProperlyReversed(t *testing.T) {
 
 	_, parameterModes, err := computer.parseOpcode(1101)
 	assert.Nil(t, err)
-	assert.Equal(t, []mode{Immediate, Immediate, Position}, parameterModes)
+	assert.Equal(t, []Mode{Immediate, Immediate, Position}, parameterModes)
 }
 
 func TestParseOpcodeInvalid(t *testing.T) {
@@ -76,7 +76,7 @@ func TestResolveParameters(t *testing.T) {
 		computer.Memory,
 		2,
 		[]AddressValue{11, 11, 0},
-		[]mode{Immediate, Immediate, Position},
+		[]Mode{Immediate, Immediate, Position},
 	)
 
 	assert.Nil(t, err)
@@ -90,7 +90,7 @@ func TestResolveParametersErrors(t *testing.T) {
 		computer.Memory,
 		2,
 		[]AddressValue{11, 11, 0},
-		[]mode{Immediate, Immediate, Immediate},
+		[]Mode{Immediate, Immediate, Immediate},
 	)
 
 	assert.Equal(t, "write parameter cannot be in immediate mode: 0", err.Error())
@@ -100,7 +100,7 @@ func TestResolveParametersErrors(t *testing.T) {
 		computer.Memory,
 		2,
 		[]AddressValue{11, 11, 0},
-		[]mode{Immediate, Immediate, 2},
+		[]Mode{Immediate, Immediate, 2},
 	)
 
 	assert.Equal(t, "invalid mode: 2", err.Error())
@@ -110,14 +110,14 @@ func TestResolveParametersErrors(t *testing.T) {
 	computer.opcodes[98] = Opcode{
 		Name:       "FAKE",
 		Opcode:     98,
-		Parameters: []readWrite{Read, Read, 2},
+		Parameters: []ReadWrite{Read, Read, 2},
 		execute:    func(computer *Computer, operation Opcode, parameters []AddressValue) {},
 	}
 	opcodeParameters, err = computer.resolveParameters(
 		computer.Memory,
 		98,
 		[]AddressValue{11, 11, 0},
-		[]mode{Immediate, Immediate, Position},
+		[]Mode{Immediate, Immediate, Position},
 	)
 
 	assert.Equal(t, "invalid parameter mode: 0", err.Error())

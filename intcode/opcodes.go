@@ -4,17 +4,17 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type mode int
+type Mode int
 
 const (
-	Position mode = iota
+	Position Mode = iota
 	Immediate
 )
 
-type readWrite int
+type ReadWrite int
 
 const (
-	Read readWrite = iota
+	Read ReadWrite = iota
 	Write
 )
 
@@ -33,7 +33,7 @@ const (
 type Opcode struct {
 	Name       string
 	Opcode     AddressValue
-	Parameters []readWrite
+	Parameters []ReadWrite
 	execute    func(*Computer, Opcode, []AddressValue)
 }
 
@@ -50,7 +50,7 @@ var Opcodes = map[AddressValue]Opcode{
 	ADD: {
 		Name:       "ADD",
 		Opcode:     ADD,
-		Parameters: []readWrite{Read, Read, Write},
+		Parameters: []ReadWrite{Read, Read, Write},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			leftHandSide := parameters[0]
 			rightHandSide := parameters[1]
@@ -70,7 +70,7 @@ var Opcodes = map[AddressValue]Opcode{
 	MULTIPLY: {
 		Name:       "MULTIPLY",
 		Opcode:     MULTIPLY,
-		Parameters: []readWrite{Read, Read, Write},
+		Parameters: []ReadWrite{Read, Read, Write},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			leftHandSide := parameters[0]
 			rightHandSide := parameters[1]
@@ -90,7 +90,7 @@ var Opcodes = map[AddressValue]Opcode{
 	INPUT: {
 		Name:       "INPUT",
 		Opcode:     INPUT,
-		Parameters: []readWrite{Write},
+		Parameters: []ReadWrite{Write},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			address := parameters[0]
 			value := <-computer.Input
@@ -109,7 +109,7 @@ var Opcodes = map[AddressValue]Opcode{
 	OUTPUT: {
 		Name:       "OUTPUT",
 		Opcode:     OUTPUT,
-		Parameters: []readWrite{Read},
+		Parameters: []ReadWrite{Read},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			value := parameters[0]
 
@@ -126,7 +126,7 @@ var Opcodes = map[AddressValue]Opcode{
 	JUMPIFTRUE: {
 		Name:       "JUMP-IF-TRUE",
 		Opcode:     JUMPIFTRUE,
-		Parameters: []readWrite{Read, Read},
+		Parameters: []ReadWrite{Read, Read},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			condition := parameters[0]
 			address := parameters[1]
@@ -147,7 +147,7 @@ var Opcodes = map[AddressValue]Opcode{
 	JUMPIFFALSE: {
 		Name:       "JUMP-IF-FALSE",
 		Opcode:     JUMPIFFALSE,
-		Parameters: []readWrite{Read, Read},
+		Parameters: []ReadWrite{Read, Read},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			condition := parameters[0]
 			address := parameters[1]
@@ -168,7 +168,7 @@ var Opcodes = map[AddressValue]Opcode{
 	LESSTHAN: {
 		Name:       "LESS-THAN",
 		Opcode:     LESSTHAN,
-		Parameters: []readWrite{Read, Read, Write},
+		Parameters: []ReadWrite{Read, Read, Write},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			lhs := parameters[0]
 			rhs := parameters[1]
@@ -197,7 +197,7 @@ var Opcodes = map[AddressValue]Opcode{
 	EQUALS: {
 		Name:       "EQUALS",
 		Opcode:     EQUALS,
-		Parameters: []readWrite{Read, Read, Write},
+		Parameters: []ReadWrite{Read, Read, Write},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			lhs := parameters[0]
 			rhs := parameters[1]
@@ -226,7 +226,7 @@ var Opcodes = map[AddressValue]Opcode{
 	HALT: {
 		Name:       "HALT",
 		Opcode:     HALT,
-		Parameters: []readWrite{},
+		Parameters: []ReadWrite{},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			log.
 				Debug().

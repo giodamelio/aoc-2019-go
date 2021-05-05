@@ -11,7 +11,7 @@ import (
 //go:embed input.txt
 var rawInput string
 
-func part1(input []int) []int {
+func part1(input []intcode.AddressValue) []intcode.AddressValue {
 	log.Println("Day 5 Part 1")
 
 	computer := intcode.NewComputer(input)
@@ -24,10 +24,10 @@ func part1(input []int) []int {
 
 	// Listen for outputs and when they are done send them on a channel
 	outputChan := computer.Output
-	allOutputs := make(chan []int)
+	allOutputs := make(chan []intcode.AddressValue)
 
 	listenForOutputs := func() {
-		var outputs []int
+		var outputs []intcode.AddressValue
 		for i := range outputChan {
 			outputs = append(outputs, i)
 		}
@@ -41,7 +41,7 @@ func part1(input []int) []int {
 	return <-allOutputs
 }
 
-func part2(input []int) int {
+func part2(input []intcode.AddressValue) intcode.AddressValue {
 	log.Println("Day 5 Part 2")
 
 	computer := intcode.NewComputer(input)
@@ -54,7 +54,7 @@ func part2(input []int) int {
 
 	// Listen for outputs and when they are done send them on a channel
 	outputChan := computer.Output
-	output := make(chan int)
+	output := make(chan intcode.AddressValue)
 
 	forwardOutputs := func() {
 		output <- <-outputChan

@@ -11,12 +11,12 @@ func TestPart1(t *testing.T) {
 	parsedInput, err := intcode.ParseInput(rawInput)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 12490719, part1(discardLogger, parsedInput))
+	assert.Equal(t, int64(12490719), part1(discardLogger, parsedInput))
 }
 
 func TestPart2(t *testing.T) {
 	parsedInput, err := intcode.ParseInput(rawInput)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 2003, part2(discardLogger, parsedInput))
+	assert.Equal(t, int64(2003), part2(discardLogger, parsedInput))
 }

@@ -28,11 +28,11 @@ func TestPart1(t *testing.T) {
 	last := output[len(output)-1]
 
 	// Ensure the last output is the solution
-	assert.Equal(t, 4511442, last)
+	assert.Equal(t, intcode.AddressValue(4511442), last)
 
 	// Ensure that all the preceding outputs are zero
 	for _, outputElement := range allButLast {
-		assert.Equal(t, 0, outputElement)
+		assert.Equal(t, intcode.AddressValue(0), outputElement)
 	}
 }
 
@@ -42,5 +42,5 @@ func TestPart2(t *testing.T) {
 
 	output := part2(parsedInput)
 
-	assert.Equal(t, 12648139, output)
+	assert.Equal(t, intcode.AddressValue(12648139), output)
 }

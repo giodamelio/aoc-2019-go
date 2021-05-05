@@ -31,15 +31,15 @@ const (
 )
 
 type Opcode struct {
-	name       string
-	opcode     AddressValue
-	parameters []readWrite
+	Name       string
+	Opcode     AddressValue
+	Parameters []readWrite
 	execute    func(*Computer, Opcode, []AddressValue)
 }
 
 // The total length of the opcode including parameters.
 func (o Opcode) length() int {
-	return 1 + len(o.parameters)
+	return 1 + len(o.Parameters)
 }
 
 func (o Opcode) incrementInstructionPointer(computer *Computer) {
@@ -48,9 +48,9 @@ func (o Opcode) incrementInstructionPointer(computer *Computer) {
 
 var Opcodes = map[AddressValue]Opcode{
 	ADD: {
-		name:       "ADD",
-		opcode:     ADD,
-		parameters: []readWrite{Read, Read, Write},
+		Name:       "ADD",
+		Opcode:     ADD,
+		Parameters: []readWrite{Read, Read, Write},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			leftHandSide := parameters[0]
 			rightHandSide := parameters[1]
@@ -68,9 +68,9 @@ var Opcodes = map[AddressValue]Opcode{
 		},
 	},
 	MULTIPLY: {
-		name:       "MULTIPLY",
-		opcode:     MULTIPLY,
-		parameters: []readWrite{Read, Read, Write},
+		Name:       "MULTIPLY",
+		Opcode:     MULTIPLY,
+		Parameters: []readWrite{Read, Read, Write},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			leftHandSide := parameters[0]
 			rightHandSide := parameters[1]
@@ -88,9 +88,9 @@ var Opcodes = map[AddressValue]Opcode{
 		},
 	},
 	INPUT: {
-		name:       "INPUT",
-		opcode:     INPUT,
-		parameters: []readWrite{Write},
+		Name:       "INPUT",
+		Opcode:     INPUT,
+		Parameters: []readWrite{Write},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			address := parameters[0]
 			value := <-computer.Input
@@ -107,9 +107,9 @@ var Opcodes = map[AddressValue]Opcode{
 		},
 	},
 	OUTPUT: {
-		name:       "OUTPUT",
-		opcode:     OUTPUT,
-		parameters: []readWrite{Read},
+		Name:       "OUTPUT",
+		Opcode:     OUTPUT,
+		Parameters: []readWrite{Read},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			value := parameters[0]
 
@@ -124,9 +124,9 @@ var Opcodes = map[AddressValue]Opcode{
 		},
 	},
 	JUMPIFTRUE: {
-		name:       "JUMP-IF-TRUE",
-		opcode:     JUMPIFTRUE,
-		parameters: []readWrite{Read, Read},
+		Name:       "JUMP-IF-TRUE",
+		Opcode:     JUMPIFTRUE,
+		Parameters: []readWrite{Read, Read},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			condition := parameters[0]
 			address := parameters[1]
@@ -145,9 +145,9 @@ var Opcodes = map[AddressValue]Opcode{
 		},
 	},
 	JUMPIFFALSE: {
-		name:       "JUMP-IF-FALSE",
-		opcode:     JUMPIFFALSE,
-		parameters: []readWrite{Read, Read},
+		Name:       "JUMP-IF-FALSE",
+		Opcode:     JUMPIFFALSE,
+		Parameters: []readWrite{Read, Read},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			condition := parameters[0]
 			address := parameters[1]
@@ -166,9 +166,9 @@ var Opcodes = map[AddressValue]Opcode{
 		},
 	},
 	LESSTHAN: {
-		name:       "LESS-THAN",
-		opcode:     LESSTHAN,
-		parameters: []readWrite{Read, Read, Write},
+		Name:       "LESS-THAN",
+		Opcode:     LESSTHAN,
+		Parameters: []readWrite{Read, Read, Write},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			lhs := parameters[0]
 			rhs := parameters[1]
@@ -195,9 +195,9 @@ var Opcodes = map[AddressValue]Opcode{
 		},
 	},
 	EQUALS: {
-		name:       "EQUALS",
-		opcode:     EQUALS,
-		parameters: []readWrite{Read, Read, Write},
+		Name:       "EQUALS",
+		Opcode:     EQUALS,
+		Parameters: []readWrite{Read, Read, Write},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			lhs := parameters[0]
 			rhs := parameters[1]
@@ -224,9 +224,9 @@ var Opcodes = map[AddressValue]Opcode{
 		},
 	},
 	HALT: {
-		name:       "HALT",
-		opcode:     HALT,
-		parameters: []readWrite{},
+		Name:       "HALT",
+		Opcode:     HALT,
+		Parameters: []readWrite{},
 		execute: func(computer *Computer, operation Opcode, parameters []AddressValue) {
 			log.
 				Debug().

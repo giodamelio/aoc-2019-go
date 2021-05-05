@@ -51,7 +51,7 @@ func TestParseOpcode(t *testing.T) {
 		opcode, parameterModes, err := computer.parseOpcode(opcode)
 
 		assert.Nil(t, err)
-		assert.Equal(t, len(computer.opcodes[opcode].parameters), len(parameterModes))
+		assert.Equal(t, len(computer.opcodes[opcode].Parameters), len(parameterModes))
 	}
 }
 
@@ -108,9 +108,9 @@ func TestResolveParametersErrors(t *testing.T) {
 
 	// Create new opcode with bad parameter mode
 	computer.opcodes[98] = Opcode{
-		name:       "FAKE",
-		opcode:     98,
-		parameters: []readWrite{Read, Read, 2},
+		Name:       "FAKE",
+		Opcode:     98,
+		Parameters: []readWrite{Read, Read, 2},
 		execute:    func(computer *Computer, operation Opcode, parameters []AddressValue) {},
 	}
 	opcodeParameters, err = computer.resolveParameters(

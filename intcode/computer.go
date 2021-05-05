@@ -70,7 +70,7 @@ func (ic Computer) parseOpcode(rawOpcode AddressValue) (AddressValue, []mode, er
 	}
 
 	// Get the number of parameters of that opcode
-	parameterCount := len(opcodeDefinition.parameters)
+	parameterCount := len(opcodeDefinition.Parameters)
 
 	// Format the rawOpcode to be as long as the opcode + parameters
 	baseOpcodeLength := 2
@@ -107,7 +107,7 @@ func (ic Computer) resolveParameters(
 	resolvedParameters := make([]AddressValue, len(opcodeParameters))
 
 	for index, opcodeParameter := range opcodeParameters {
-		parameterMode := ic.opcodes[opcode].parameters[index]
+		parameterMode := ic.opcodes[opcode].Parameters[index]
 
 		switch parameterModes[index] {
 		case Position:
@@ -160,7 +160,7 @@ func (ic *Computer) Step() (AddressValue, error) {
 		Msg("[COMPUTER] Parsed opcode")
 
 	// Get the parameters for the opcode
-	parametersLength := len(ic.opcodes[opcode].parameters)
+	parametersLength := len(ic.opcodes[opcode].Parameters)
 	opcodeParameters := ic.Memory.GetRange(ic.instructionPointer+1, int64(parametersLength))
 	// TODO: fix this log
 	// log.Trace().Ints("parameters", opcodeParameters).Msg("[COMPUTER] Retrieved opcode parameters")
@@ -176,7 +176,7 @@ func (ic *Computer) Step() (AddressValue, error) {
 
 	// Execute the opcode
 	operation := ic.opcodes[opcode]
-	log.Trace().Str("opcodeName", operation.name).Msg("[COMPUTER] Executing operation")
+	log.Trace().Str("opcodeName", operation.Name).Msg("[COMPUTER] Executing operation")
 	operation.execute(ic, operation, opcodeParameters)
 
 	return opcode, nil

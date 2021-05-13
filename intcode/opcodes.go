@@ -6,6 +6,7 @@ import (
 
 type Mode int
 
+// Define the different modes an instruction paramater can have.
 const (
 	Position Mode = iota
 	Immediate
@@ -13,11 +14,13 @@ const (
 
 type ReadWrite int
 
+// Define the modes an instruction parameter can have.
 const (
 	Read ReadWrite = iota
 	Write
 )
 
+// Define the ints behind all the opcodes.
 const (
 	ADD         = 1
 	MULTIPLY    = 2
@@ -46,6 +49,7 @@ func (o Opcode) incrementInstructionPointer(computer *Computer) {
 	computer.SetInstructionPointer(computer.instructionPointer + AddressLocation(o.length()))
 }
 
+// Opcodes sets up all the operations our computer is capeable of.
 var Opcodes = map[AddressValue]Opcode{
 	ADD: {
 		Name:       "ADD",

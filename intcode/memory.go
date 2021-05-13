@@ -32,7 +32,7 @@ func (im Memory) Get(address AddressLocation) AddressValue {
 	return value
 }
 
-// Get the values from a range of addresses.
+// GetRange gets the values from a range of addresses.
 func (im Memory) GetRange(address AddressLocation, length int64) []AddressValue {
 	value := im.rawMemory[address : int64(address)+length]
 

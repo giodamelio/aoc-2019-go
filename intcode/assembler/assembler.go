@@ -33,15 +33,21 @@ func parseArgument(argument string) (int, byte) {
 	return arg, '0'
 }
 
+func buildOpcodeMap() map[string]intcode.Opcode {
+	opcodeMap := make(map[string]intcode.Opcode)
+	for _, opcodeDetails := range intcode.Opcodes {
+		opcodeMap[opcodeDetails.Name] = opcodeDetails
+	}
+
+	return opcodeMap
+}
+
 func Assemble(programRaw string) []intcode.AddressValue {
 	lines := strings.Split(strings.TrimSpace(programRaw), "\n")
 	program := make([]intcode.AddressValue, 0, len(lines))
 
 	// Build a map of TEXT to OPCODE mappings from the OPCODE to TEXT map
-	opcodeMap := make(map[string]intcode.Opcode)
-	for _, opcodeDetails := range intcode.Opcodes {
-		opcodeMap[opcodeDetails.Name] = opcodeDetails
-	}
+	opcodeMap := buildOpcodeMap()
 
 	for _, line := range lines {
 		// Compact multiple tabs into one tab
@@ -51,8 +57,19 @@ func Assemble(programRaw string) []intcode.AddressValue {
 		// Split the line up by tabs
 		sections := strings.Split(strings.TrimSpace(lineSingleTabs), "\t")
 
+		// Raw instruction
+		rawInstruction := sections[0]
+
+		// Special case to append raw data
+		if rawInstruction == "DATA" {
+			arg, _ := parseArgument(sections[1])
+			program = append(program, intcode.AddressValue(arg))
+
+			continue
+		}
+
 		// Get opcode details using the first section
-		opcode := opcodeMap[sections[0]]
+		opcode := opcodeMap[rawInstruction]
 
 		// Get the count of arguments
 		argumentCount := len(sections[1:])

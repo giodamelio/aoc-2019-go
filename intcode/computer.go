@@ -162,7 +162,7 @@ func (ic *Computer) Step() (AddressValue, error) {
 	// Get the parameters for the opcode
 	parametersLength := len(ic.opcodes[opcode].Parameters)
 	opcodeParameters := ic.Memory.GetRange(ic.instructionPointer+1, int64(parametersLength))
-	// TODO: fix this log
+	// TO DO: fix this log
 	// log.Trace().Ints("parameters", opcodeParameters).Msg("[COMPUTER] Retrieved opcode parameters")
 
 	// Resolve the parameters based on the modes
@@ -171,7 +171,7 @@ func (ic *Computer) Step() (AddressValue, error) {
 		return -1, err
 	}
 
-	// TODO: fix this log
+	// TO DO: fix this log
 	// log.Trace().Ints("parameters", opcodeParameters).Msg("[COMPUTER] Resolved opcode parameters")
 
 	// Execute the opcode

@@ -3,6 +3,7 @@ package intcode
 import "github.com/rs/zerolog/log"
 
 type AddressLocation int64
+
 type AddressValue int64
 
 type Memory struct {
@@ -33,13 +34,13 @@ func (im Memory) Get(address AddressLocation) AddressValue {
 
 // Get the values from a range of addresses.
 func (im Memory) GetRange(address AddressLocation, length int64) []AddressValue {
-	value := im.rawMemory[address : int64(address)+int64(length)]
+	value := im.rawMemory[address : int64(address)+length]
 
 	log.
 		Trace().
 		Int64("address", int64(address)).
-		Int64("length", int64(length)).
-		// TODO: fix this log
+		Int64("length", length).
+		// TO DO: fix this log
 		// Ints("value", value).
 		Msg("[MEMORY] GetRange")
 
